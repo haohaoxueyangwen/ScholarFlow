@@ -1,0 +1,4 @@
+interface:
+  display_name: "ScholarFlow Literature Synthesis"
+  short_description: "Synthesize literature with evidence links"
+  default_prompt: "Use $scholarflow-literature-synthesis to synthesize literature for my research question."

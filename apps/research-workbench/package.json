@@ -1,0 +1,49 @@
+{
+  "name": "@scholarflow/research-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build && node scripts/build-stamp.mjs",
+    "start": "node scripts/serve-local.mjs",
+    "test": "npm run build && npm run test:unit && node --test tests/rendered-html.test.mjs tests/local-server.test.mjs",
+    "test:unit": "node --experimental-strip-types --test tests/behavior.test.mjs tests/manuscript-workspace.test.mjs tests/reading-desk.test.mjs tests/build-stamp.test.mjs",
+    "typecheck": "tsc --noEmit --incremental false",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "audit:gate": "python ../../scripts/workbench_dependency_gate.py",
+    "desktop": "electron desktop/main.cjs",
+    "quality": "npm run typecheck && npm run lint && npm test && npm run audit:gate"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "pdfjs-dist": "5.4.296",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-markdown": "10.1.0",
+    "react-pdf": "10.5.0",
+    "remark-gfm": "4.0.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.48.0",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.4",
+    "@vitejs/plugin-rsc": "0.5.32",
+    "axe-core": "4.12.1",
+    "electron": "^44.5.1",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.4",
+    "react-server-dom-webpack": "19.2.8",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vinext": "0.0.50",
+    "vite": "8.1.5",
+    "wrangler": "4.115.0"
+  },
+  "type": "module"
+}

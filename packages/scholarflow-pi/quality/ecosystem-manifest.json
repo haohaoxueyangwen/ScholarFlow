@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "one_generic_memory_owner": true,
+    "open_source_search_required": true,
+    "adoption_decisions": [
+      "adopt",
+      "wrap_and_adapt",
+      "absorb",
+      "self_build"
+    ],
+    "required_review_fields": [
+      "package",
+      "version",
+      "capability",
+      "license",
+      "source",
+      "source_reviewed",
+      "permission_class",
+      "domain_write_owner",
+      "adoption_decision",
+      "update_policy",
+      "removal_procedure"
+    ]
+  },
+  "vendored": [
+    {
+      "package": "Yuan1z0825/nature-skills",
+      "version": "1ea82ffff20f40077bf84b74182f55eeaf3d111d",
+      "capability": "Nature-style manuscript writing method and shared scientific-writing guidance",
+      "license": "Apache-2.0",
+      "source": "https://github.com/Yuan1z0825/nature-skills",
+      "source_reviewed": true,
+      "permission_class": "content-only",
+      "domain_write_owner": "scholarflow-pi",
+      "adoption_decision": "wrap_and_adapt",
+      "update_policy": "detect upstream commits weekly; review diff, validate upstream contracts, refresh the pinned vendor snapshot and run ScholarFlow writing gates before activation",
+      "removal_procedure": "remove the vendor snapshot and scholarflow-manuscript-writing Skill, remove its fixture and writing route, then verify no manuscript proposal path remains"
+    }
+  ],
+  "packages": [
+    {
+      "package": "pi-web-access",
+      "version": "0.21.0",
+      "capability": "web and text-PDF retrieval",
+      "license": "MIT",
+      "source": "https://github.com/nicobailon/pi-web-access",
+      "source_reviewed": true,
+      "permission_class": "ask",
+      "domain_write_owner": "scholarflow-pi",
+      "adoption_decision": "adopt",
+      "update_policy": "detect registry update, review source diff, run canary and activate only after gates pass",
+      "removal_procedure": "remove the exact package from runtime policy and Pi settings, reinstall the managed graph and run the release gate"
+    },
+    {
+      "package": "pi-mcp-adapter",
+      "version": "2.22.0",
+      "capability": "external MCP transport",
+      "license": "MIT",
+      "source": "https://github.com/nicobailon/pi-mcp-adapter",
+      "source_reviewed": true,
+      "permission_class": "ask",
+      "domain_write_owner": "scholarflow-pi",
+      "adoption_decision": "adopt",
+      "update_policy": "detect registry update, review source diff and MCP permission changes, run canary and activate only after gates pass",
+      "removal_procedure": "remove the exact package and MCP configuration from runtime policy and Pi settings, reinstall and run the release gate"
+    },
+    {
+      "package": "pi-hermes-memory",
+      "version": "0.9.4",
+      "capability": "generic durable memory and session recall",
+      "license": "MIT",
+      "source": "https://github.com/chandra447/pi-hermes-memory",
+      "source_reviewed": true,
+      "permission_class": "ask",
+      "domain_write_owner": "pi-hermes-memory",
+      "adoption_decision": "adopt",
+      "update_policy": "detect registry update, review memory schema and ownership changes, run migration and rollback canary before activation",
+      "removal_procedure": "export or archive the Hermes store, remove the package pin and configuration, reinstall and verify ScholarFlow truth remains independent"
+    },
+    {
+      "package": "@gotgenes/pi-permission-system",
+      "version": "20.10.0",
+      "capability": "tool, path, shell, and MCP permissions",
+      "license": "MIT",
+      "source": "https://github.com/gotgenes/pi-packages/tree/main/packages/pi-permission-system",
+      "source_reviewed": true,
+      "permission_class": "policy",
+      "domain_write_owner": "scholarflow-pi",
+      "adoption_decision": "adopt",
+      "update_policy": "major versions require source and policy diff review plus the complete live permission release gate",
+      "removal_procedure": "restore the reviewed fallback permission policy, remove the package pin and extension configuration, then rerun security and live gates"
+    }
+  ]
+}

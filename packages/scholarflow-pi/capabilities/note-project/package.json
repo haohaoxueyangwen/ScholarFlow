@@ -1,0 +1,9 @@
+{
+  "name": "@scholarflow/note-project",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "pi": {"extensions": ["./extension.ts"], "skills": ["./skills/note-project"]},
+  "peerDependencies": {"@earendil-works/pi-coding-agent": "*", "typebox": "*"}
+}

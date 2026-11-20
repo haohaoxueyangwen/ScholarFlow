@@ -1,0 +1,4 @@
+interface:
+  display_name: "ScholarFlow Research Plan"
+  short_description: "Build evidence-linked research plans"
+  default_prompt: "Use $scholarflow-research-plan to build a governed research plan from current project evidence."

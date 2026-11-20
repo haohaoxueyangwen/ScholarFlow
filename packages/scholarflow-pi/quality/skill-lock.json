@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "spec_url": "https://agentskills.io/specification",
+  "package_version": "0.1.0",
+  "skills": [
+    {
+      "name": "scholarflow-automation-inbox",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-automation-inbox",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "c6c6257e8d1db239b38722cf1aeaeb640cd0161faa21b9343a7a803f9352bb5a",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-08-28"
+    },
+    {
+      "name": "scholarflow-daily-review",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-daily-review",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "fea5ed05f6a4bf5bf1363d47ca3cf6d406a15cca544611bd09635b80c56dd280",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-14"
+    },
+    {
+      "name": "scholarflow-experiment-log",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-experiment-log",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "32f223818e17123935a11aad33ec7d7f9cbe7867e2e639549d1a799fa72775e8",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-08-28"
+    },
+    {
+      "name": "scholarflow-literature-synthesis",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-literature-synthesis",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "1cee3d20147bd7d8ebf7712e4a86c96ef22f9ba77ee4e60077f4012e1d947dd5",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-14"
+    },
+    {
+      "name": "scholarflow-open-research",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-open-research",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "7bb315c317dba9ce11457f7ef2d5a1337ae07d180360a00f7b198c52d4449890",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-17"
+    },
+    {
+      "name": "scholarflow-manuscript-writing",
+      "source_type": "upstream_adapter",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-manuscript-writing",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "d81117e13648f30822f461c5ded930d7591ba985b7b30261e0f0f1249b5dd3c4",
+      "update_policy": "review_upstream_diff_refresh_pin_then_run_writing_gates",
+      "reviewed_at": "2026-09-14",
+      "upstream": {
+        "package": "Yuan1z0825/nature-skills",
+        "source": "https://github.com/Yuan1z0825/nature-skills",
+        "revision": "1ea82ffff20f40077bf84b74182f55eeaf3d111d",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "name": "scholarflow-paper-triage",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-paper-triage",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "73731c396ae106bdfa4e9678b959b96c4827a846a8087cb1bbe8d88ba7859c71",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-08-28"
+    },
+    {
+      "name": "scholarflow-project-bootstrap",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-project-bootstrap",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "9fe684e38c8de2481423e5ccf27ebd2748c7850960200a1b17891bcb62756451",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-17"
+    },
+    {
+      "name": "scholarflow-project-context",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-project-context",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "b3db941e408014c0748bb296918d078cbcc3b62c763d2622f74a6793a3faa789",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-16"
+    },
+    {
+      "name": "scholarflow-research-intake",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-research-intake",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "a632f388158214e02e96891a0c5ef61450aa6ca15ddbac242b38712adfbee82a",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-08-28"
+    },
+    {
+      "name": "scholarflow-research-plan",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-research-plan",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "3945e5d9c604ba053f79910d570e135d318a0240bacc564b3156931884d4478f",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-14"
+    },
+    {
+      "name": "scholarflow-simulation-analysis",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-simulation-analysis",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "f31a85e8d4c3e9d1311e020a2a9e5d96f6e760d44a0c25ba677b7e35c4e9288d",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-08-28"
+    },
+    {
+      "name": "scholarflow-weekly-review",
+      "source_type": "first_party",
+      "source": "workspace://packages/scholarflow-pi/skills/scholarflow-weekly-review",
+      "source_revision": "@scholarflow/pi@0.1.0",
+      "content_sha256": "abdd0faa8eca08bad087fd4e05b009c3559a604b102eee1e0e7b7c6a6fa04676",
+      "update_policy": "repository_versioned_and_release_gated",
+      "reviewed_at": "2026-09-14"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "ScholarFlow Automation Inbox"
+  short_description: "Process scheduled research workflows"
+  default_prompt: "Use $scholarflow-automation-inbox to process pending scheduled ScholarFlow workflows."

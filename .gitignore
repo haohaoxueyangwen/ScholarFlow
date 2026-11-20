@@ -1,0 +1,62 @@
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Python environments and packaging output
+.venv/
+venv/
+env/
+build/
+dist/
+output/
+tmp/
+.playwright-cli/
+*.egg-info/
+
+# Node dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ScholarFlow and Pi runtime state
+.tmp/
+.pi/npm/
+.pi/git/
+.pi/cache/
+.pi/sessions/
+deploy/lightrag/runtime/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tsbuildinfo
+# Local research facts, source manifests, private notes and derived indexes.
+# Protect all local runtime data from future adds. Already tracked files and
+# history are unaffected; they require a separate audit before any push.
+/.local/
+/.local/research-library/
+# Bounded provider probes: synthetic facts, credentials-free events and budgets.
+/.local/api-probes/
+/.local/research-workspaces/

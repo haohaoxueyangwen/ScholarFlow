@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "engine": "LightRAG",
+  "package": "lightrag-hku",
+  "version": "1.5.4",
+  "source_commit": "9a45b64c2ee25b1d806e90db926a8af37480bb16",
+  "wheel_sha256": "3bb28b2a763a91fb11b9ac87798140be852891edf71266cff59018d23afeea9d",
+  "license": "MIT",
+  "api_profile": {
+    "health": "/health",
+    "query": "/query",
+    "text_ingest": "/documents/text",
+    "track_status": "/documents/track_status/{track_id}",
+    "delete_document": "/documents/delete_document",
+    "pipeline_status": "/documents/pipeline_status"
+  },
+  "security": {
+    "minimum_safe_version": "1.5.4",
+    "advisory": "CVE-2026-61736",
+    "bind": "127.0.0.1",
+    "api_key_required": true,
+    "remote_http_allowed": false
+  },
+  "acceptance": {
+    "contract_tests": "passed",
+    "real_service": "passed",
+    "accepted_at": "2026-07-27",
+    "deployment": "windows_native",
+    "llm": "deepseek-chat",
+    "embedding": {
+      "runtime": "llama.cpp-b9631",
+      "model": "Qwen3-Embedding-0.6B-Q8_0",
+      "dimension": 1024,
+      "model_sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+    },
+    "reranker": {
+      "runtime": "llama.cpp-b9631",
+      "binding": "cohere-compatible",
+      "model": "BGE-Reranker-v2-M3-Q4_K_M",
+      "model_sha256": "cc1d06602269713f710569a5eb371beff4edd0a1e988299bcc46821392b8cca5",
+      "source": "Geofront/BGE-Reranker-v2-M3-GGUF",
+      "accepted_at": "2026-08-18"
+    },
+    "gates": {
+      "health": "passed",
+      "api_key_enforcement": "passed",
+      "ingest_processed": "passed",
+      "provenance_checked_retrieval": "passed",
+      "restart_persistence": "passed",
+      "update_removes_stale_evidence": "passed",
+      "delete_removes_evidence_and_source_map": "passed",
+      "multilingual_reranker_smoke": "passed",
+      "project_scoped_retrieval_repeat_3": "passed",
+      "cross_project_abstention": "passed"
+    }
+  }
+}

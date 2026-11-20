@@ -1,0 +1,4 @@
+interface:
+  display_name: "ScholarFlow Simulation Analysis"
+  short_description: "Analyze simulation evidence and gaps"
+  default_prompt: "Use $scholarflow-simulation-analysis to analyze simulation results and propose the next experiment."

@@ -1,0 +1,13 @@
+{
+  "name": "nature-skills",
+  "source": "https://github.com/Yuan1z0825/nature-skills",
+  "commit": "1ea82ffff20f40077bf84b74182f55eeaf3d111d",
+  "license": "Apache-2.0",
+  "adoption_decision": "wrap_and_adapt",
+  "vendored_paths": [
+    "skills/nature-writing",
+    "skills/nature-shared"
+  ],
+  "local_adapter": "skills/scholarflow-manuscript-writing",
+  "reviewed_at": "2026-08-12"
+}

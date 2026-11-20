@@ -1,0 +1,37 @@
+{
+  "contract_id": "information-duties-v1",
+  "classes": [
+    {
+      "code": "session_summary",
+      "label": "Session summary / prior chat",
+      "project_fact": false
+    },
+    {
+      "code": "preference_memory",
+      "label": "User preference memory",
+      "project_fact": false
+    },
+    {
+      "code": "scholarflow_record",
+      "label": "ScholarFlow stored records",
+      "project_fact": true
+    },
+    {
+      "code": "knowledge_base",
+      "label": "AI knowledge base evidence",
+      "project_fact": "conditional"
+    }
+  ],
+  "history_tools": ["memory_search", "session_search"],
+  "project_status_allowlist": [
+    "sf_lane_enter",
+    "sf_project_search",
+    "sf_project_get"
+  ],
+  "rules": {
+    "ordinary_project_status_opens_history_tools": false,
+    "memory_says_claim_opens_history_tools": false,
+    "explicit_history_retrieval_opens_history_tools": true,
+    "unauthorized_attempt_policy": "block_and_record"
+  }
+}

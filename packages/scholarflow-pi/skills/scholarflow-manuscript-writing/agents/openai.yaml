@@ -1,0 +1,4 @@
+interface:
+  display_name: "ScholarFlow Manuscript Writing"
+  short_description: "Grounded Nature-style manuscript drafting"
+  default_prompt: "Use $scholarflow-manuscript-writing to draft an evidence-grounded manuscript section for the current project."

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {"id": "fact-zh-status", "scope": "project", "prompt": "查询 stage-deep-learning 的当前状态。", "expected_workload": "factual_query"},
+    {"id": "fact-zh-paper", "scope": "project", "prompt": "这篇论文的 DOI 和作者是什么？", "expected_workload": "factual_query"},
+    {"id": "fact-en-tasks", "scope": "project", "prompt": "List the stored tasks for this project.", "expected_workload": "factual_query"},
+    {"id": "fact-en-paper", "scope": "project", "prompt": "Is paper-x marked to_read?", "expected_workload": "factual_query"},
+    {"id": "fact-zh-readonly", "scope": "task", "prompt": "核对当前条目的标题和年份，不要修改。", "expected_workload": "factual_query"},
+
+    {"id": "sequence-zh-continue", "scope": "task", "prompt": "继续刚才的任务，下一步做什么？", "expected_workload": "sequential_decision"},
+    {"id": "sequence-en-compare", "scope": "task", "prompt": "Compare the two proposed methods and decide which experiment to run next.", "expected_workload": "sequential_decision"},
+    {"id": "sequence-zh-chapter", "scope": "project", "prompt": "我们已经完成第一章，请安排第二章的学习步骤。", "expected_workload": "sequential_decision"},
+    {"id": "sequence-en-checkpoint", "scope": "task", "prompt": "Based on the latest checkpoint, continue implementing the parser.", "expected_workload": "sequential_decision"},
+    {"id": "sequence-zh-choice", "scope": "project", "prompt": "这个方案 A/B 怎么选，给出决定依据。", "expected_workload": "sequential_decision"},
+
+    {"id": "review-zh-weekly", "scope": "project", "prompt": "为花书项目做一次周度回顾，列出进展、阻塞和下一步。", "expected_workload": "project_review"},
+    {"id": "review-en-gaps", "scope": "project", "prompt": "Review this project's progress, evidence gaps, and blockers.", "expected_workload": "project_review"},
+    {"id": "review-zh-daily", "scope": "project", "prompt": "生成今天的项目日报。", "expected_workload": "project_review"},
+    {"id": "review-zh-risk", "scope": "project", "prompt": "对当前课题做阶段复盘并总结风险。", "expected_workload": "project_review"},
+    {"id": "review-en-supervisor", "scope": "project", "prompt": "Summarize the current project for a supervisor meeting.", "expected_workload": "project_review"},
+
+    {"id": "cross-zh-priority", "scope": "global", "prompt": "汇总所有项目的进展并排出本周优先级。", "expected_workload": "cross_project_synthesis"},
+    {"id": "cross-en-blockers", "scope": "global", "prompt": "Compare blockers across all active research projects.", "expected_workload": "cross_project_synthesis"},
+    {"id": "cross-zh-control", "scope": "global", "prompt": "做一次科研总控回顾，检查各个项目风险。", "expected_workload": "cross_project_synthesis"},
+    {"id": "cross-en-attention", "scope": "global", "prompt": "Which of my projects should receive attention first?", "expected_workload": "cross_project_synthesis"},
+    {"id": "cross-en-portfolio", "scope": "global", "prompt": "Synthesize the portfolio status across multiple theses.", "expected_workload": "cross_project_synthesis"},
+
+    {"id": "research-zh-agent", "scope": "global", "prompt": "搜索最新的 agent context engineering 论文并做综述。", "expected_workload": "open_research"},
+    {"id": "research-zh-rag", "scope": "project", "prompt": "调研 LightRAG 与 GraphRAG 的最新研究差异。", "expected_workload": "open_research"},
+    {"id": "research-en-memory", "scope": "global", "prompt": "Find primary papers on continual memory for research agents.", "expected_workload": "open_research"},
+    {"id": "research-zh-gap", "scope": "project", "prompt": "这个领域目前有哪些研究空白？", "expected_workload": "open_research"},
+    {"id": "research-en-retrieval", "scope": "global", "prompt": "Explore whether hierarchical retrieval improves long-horizon agents.", "expected_workload": "open_research"}
+  ]
+}

@@ -1,0 +1,83 @@
+/** Small transport and state contracts shared by the Pi-native reading desk. */
+export type DeskScope = { stage: string; id: string; generation: number };
+
+export function isSameScope(current: DeskScope, captured: DeskScope): boolean {
+  return current.stage === captured.stage && current.id === captured.id && current.generation === captured.generation;
+}
+
+export function draftKey(project: string, workspace: string): string {
+  return `scholarflow:reading-desk:draft:${encodeURIComponent(project)}:${encodeURIComponent(workspace)}`;
+}
+
+export function readDraft(storage: Storage | null, project: string, workspace: string): { value: string; available: boolean } {
+  try {
+    if (!storage) throw new Error("storage unavailable");
+    return { value: storage.getItem(draftKey(project, workspace)) || "", available: true };
+  } catch { return { value: "", available: false }; }
+}
+
+export function writeDraft(storage: Storage | null, project: string, workspace: string, value: string): boolean {
+  try {
+    if (!storage) throw new Error("storage unavailable");
+    if (value) storage.setItem(draftKey(project, workspace), value);
+    else storage.removeItem(draftKey(project, workspace));
+    return true;
+  } catch { return false; }
+}
+
+export function browserStorage(): Storage | null {
+  try { return window.localStorage; } catch { return null; }
+}
+
+export function canAskKnowledge(workspace: { knowledge_available: boolean }): boolean {
+  return workspace.knowledge_available === true;
+}
+
+export function uniquePdfSources<T extends { import_id?: string; anchor?: { page_start?: number } }>(sources: T[]): T[] {
+  const seen = new Set<string>();
+  return sources.filter((source) => {
+    const page = source.anchor?.page_start;
+    if (!source.import_id || !/^pdf_[a-f0-9]{24}$/.test(source.import_id) || !Number.isSafeInteger(page) || (page || 0) < 1) return false;
+    const key = `${source.import_id}:${page}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function turnStateText(status: string, error?: string): string {
+  if (status === "interrupted") return error || "任务已中断；请检查连接后重新发送。";
+  if (status === "failed") return error || "这一轮失败了；请检查连接后重试。";
+  if (status === "queued") return "正在等待 Pi 处理…";
+  if (status === "running") return "Pi 正在阅读…";
+  return "状态未知，请刷新后重试。";
+}
+
+export function researchApiBase(): string {
+  const configured = process.env.NEXT_PUBLIC_SCHOLARFLOW_RESEARCH_URL || "http://127.0.0.1:8787";
+  const url = new URL(configured);
+  if (url.protocol !== "http:" || !["127.0.0.1", "localhost"].includes(url.hostname) || url.username || url.password || url.pathname !== "/" || url.search || url.hash) {
+    throw new Error("Research API must be a loopback HTTP origin");
+  }
+  // Cookies are site-bound. Use the same loopback hostname as the web page.
+  if (typeof window !== "undefined" && ["127.0.0.1", "localhost"].includes(window.location.hostname)) url.hostname = window.location.hostname;
+  return url.origin;
+}
+
+export async function researchRequest(
+  base: string,
+  path: string,
+  init: RequestInit = {},
+  fetcher: typeof fetch = fetch,
+): Promise<Response> {
+  const url = new URL(base);
+  if (url.protocol !== "http:" || !["127.0.0.1", "localhost"].includes(url.hostname) || url.username || url.password || url.pathname !== "/" || url.search || url.hash) {
+    throw new Error("Research API must be a loopback HTTP origin");
+  }
+  if (!path.startsWith("/") || path.startsWith("//")) throw new Error("Invalid research API path");
+  const session = await fetcher(`${url.origin}/session`, { credentials: "include", cache: "no-store" });
+  if (!session.ok) throw new Error("本地研究会话无法连接；请检查启动器和网页地址。");
+  const headers = new Headers(init.headers);
+  if ((init.method || "GET").toUpperCase() === "POST") headers.set("X-ScholarFlow-Intent", "confirm");
+  return fetcher(`${url.origin}${path}`, { ...init, headers, credentials: "include", cache: "no-store" });
+}

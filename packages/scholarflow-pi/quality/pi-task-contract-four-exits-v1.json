@@ -1,0 +1,85 @@
+{
+  "contract_id": "pi-task-contract-four-exits-v1",
+  "schema_version": 1,
+  "doc": "docs/architecture/pi-task-contract-four-exits-v1.md",
+  "template_doc": "docs/architecture/skill-onboarding-template-v1.md",
+  "four_exits": [
+    "flow_instructions",
+    "tool_surface",
+    "execution_guards",
+    "fixture_outcomes"
+  ],
+  "skills": {
+    "scholarflow-project-bootstrap": {
+      "outcome_contract": "project-create-outcomes-v4",
+      "outcome_contract_path": "quality/project-create-outcomes-v4.json",
+      "flow_route_key": "project_bootstrap",
+      "legal_exits": [
+        "create_proposal",
+        "reuse_existing",
+        "clarify",
+        "evidence_gap",
+        "first_task_proposal"
+      ],
+      "tool_surface": {
+        "lane": "project",
+        "reads": [
+          "sf_lane_enter",
+          "sf_paper_search",
+          "sf_paper_get",
+          "sf_project_search",
+          "sf_project_get",
+          "sf_task_search"
+        ],
+        "proposals": [
+          "sf_project_propose_create",
+          "sf_task_propose_create"
+        ],
+        "forbidden_same_turn": [
+          "sf_project_apply_create",
+          "sf_task_apply_create",
+          "memory_search",
+          "session_search"
+        ]
+      },
+      "execution_guards": [
+        "projectBootstrapPrompt",
+        "isToolAllowedForIntent",
+        "bindStageToolCall",
+        "allowedInLane"
+      ]
+    },
+    "scholarflow-project-context": {
+      "outcome_contract": "information-duties-v1",
+      "outcome_contract_path": "quality/information-duties-v1.json",
+      "resolution_module": "extensions/project-resolution.js",
+      "flow_route_key": "project_context",
+      "legal_exits": [
+        "grounded_answer"
+      ],
+      "tool_surface": {
+        "lane": "project",
+        "reads": [
+          "sf_lane_enter",
+          "sf_project_search",
+          "sf_project_get"
+        ],
+        "history_tools_when": "explicit_history_retrieval_only",
+        "forbidden_same_turn": [
+          "sf_project_apply_update",
+          "sf_project_propose_create",
+          "sf_task_propose_create",
+          "memory_search",
+          "session_search"
+        ]
+      },
+      "execution_guards": [
+        "projectPrompt",
+        "guardProjectSearchCall",
+        "bindStageToolCall",
+        "allowedInLane",
+        "information_duties_v1"
+      ]
+    }
+  }
+}

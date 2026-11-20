@@ -1,0 +1,1271 @@
+{
+  "schema": "scholarflow-public-snapshot-v1",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "aab5d105881771bacbabcc6f5b85bf94f51f33bb21d452cc58aef2bd13276516"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "5491449285c024bcdcd15c4bfbccee8af6487265c413e8f89b80a57df6277049"
+    },
+    {
+      "path": "apps/research-workbench/.openai/hosting.json",
+      "sha256": "d532abb65cf9ae20634b464d954cb4a08a0de9f3cd3cdf7f9c3ec8948826d947"
+    },
+    {
+      "path": "apps/research-workbench/app/components/annotatable-pdf.tsx",
+      "sha256": "53e561864795d7d6073550fefb94a857433b7dca7b2e047430735945bdfd6c39"
+    },
+    {
+      "path": "apps/research-workbench/app/components/citation-graph.tsx",
+      "sha256": "6edda90c9bd3abeb9d6b3f837d2b9ad7385def17e33fa303a0d31899a60169a5"
+    },
+    {
+      "path": "apps/research-workbench/app/components/paper-reader.tsx",
+      "sha256": "aee68dd343e211a795e3a2148ef7a2b135a3fcdc3f6743a9bc7db09d4011ebe6"
+    },
+    {
+      "path": "apps/research-workbench/app/components/reading-desk.tsx",
+      "sha256": "ff6a5dedc7c77e302f944e954ef9027c0273b49697bcc41fe0a0378db7f0a04c"
+    },
+    {
+      "path": "apps/research-workbench/app/components/research-loop-workspace.tsx",
+      "sha256": "52315bc23f1a5784ff4214f948df7333409751264d5a3d0bced66172eb50fe6f"
+    },
+    {
+      "path": "apps/research-workbench/app/components/safe-markdown.tsx",
+      "sha256": "f3f0a54c090f31019dafb8b26669b37f836e7f4109f06bfee71456ce695287f3"
+    },
+    {
+      "path": "apps/research-workbench/app/components/translation-popup.tsx",
+      "sha256": "e13b5ca874e86bd1d82ce4cb2b7515e185606c2b02c9000f66a0b5776ec9a601"
+    },
+    {
+      "path": "apps/research-workbench/app/desk/page.tsx",
+      "sha256": "d07cdb554b5f332f0a3cb2d141d9be2ccfa53d0a7c64ec8cffedc651de3a0830"
+    },
+    {
+      "path": "apps/research-workbench/app/globals.css",
+      "sha256": "986a7384ca34c276387983e255c14fa812c5e61e6ec14302c353be8a9a9ca62e"
+    },
+    {
+      "path": "apps/research-workbench/app/layout.tsx",
+      "sha256": "9190c37ff49a421fd3f50b86b8f20d5c22288b46c6da2da496f6c09395cbd576"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/api.ts",
+      "sha256": "cd4ae62fc22f662f8d3380656939f20dd808951b9ae163709886492478811b8d"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/conversation.ts",
+      "sha256": "ad8e76f9afeb223df250cca0cfc67a0be7fffd3453da991882834350af54d8e1"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/draft-storage.ts",
+      "sha256": "98bcfa134b788c231efefe9b544740a96ca7a8d6ad53429f723c6212a6609464"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/manuscript-workspace.ts",
+      "sha256": "10f7e6f4b026d92d78762e86ea10336890f3a5c4cb0a3130636349aaef37af6a"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/markdown.ts",
+      "sha256": "cb734287df4a4ce14d3d29b8f90b4c0014f0d9188c26c43e09fda51b0d2acf06"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/pdf-anchors.ts",
+      "sha256": "1dc3a44fbafe0754fcb0e0937d83cd8cfeb6cab4edbb497be589fc76b851acce"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/presentation.ts",
+      "sha256": "99bdda65f5629638a5f6285eea5363aa996310356b101f9ad38c032911048498"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/reader-handoff.ts",
+      "sha256": "ca86e19a9f8394533f3c8e24f53b1514c10beb53c4cdde51c1121aa88a0f1458"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/reader-window.ts",
+      "sha256": "44b38efb579a92c2ad3740320e281c68ddad867e69f38af7a6db28d494f215db"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/research-desk.ts",
+      "sha256": "346c35455108a66012f44573a78c64ab3ea780263672ea752cb5d98c9dce92e1"
+    },
+    {
+      "path": "apps/research-workbench/app/lib/types.ts",
+      "sha256": "3902f8bece893257a94bd061c086e13ae2451e1a69fad4662ddd619af01091d3"
+    },
+    {
+      "path": "apps/research-workbench/app/page.tsx",
+      "sha256": "f407c10f3c278c0d27033c35886183a4855c40870663a592700965ec051e972e"
+    },
+    {
+      "path": "apps/research-workbench/app/reader/page.tsx",
+      "sha256": "b81ac0882737ef2c60186e8100847897126833d07abf102b9ddd0c2d5ec58b90"
+    },
+    {
+      "path": "apps/research-workbench/desktop/main.cjs",
+      "sha256": "61b55a7d59d834357bc2dbfa3f53501eebc1722944fe3106f294fef008913f0d"
+    },
+    {
+      "path": "apps/research-workbench/eslint.config.mjs",
+      "sha256": "8686ea429c79fda3bda5926226a7b84b1abe35dd2338c919d0a77aad44c36aeb"
+    },
+    {
+      "path": "apps/research-workbench/next.config.ts",
+      "sha256": "614bce25b089c3f19b1e17a6346c74b858034040154c6621e7d35303004767cc"
+    },
+    {
+      "path": "apps/research-workbench/package-lock.json",
+      "sha256": "846c2da438540edddbb5ce17c363644af54f5f6bf1791c8596b547862d2b0616"
+    },
+    {
+      "path": "apps/research-workbench/package.json",
+      "sha256": "9536b170c1c9a2dc957b1f74a686d62f1d48eea5c6ca3cf8b3df66fcea4077dd"
+    },
+    {
+      "path": "apps/research-workbench/postcss.config.mjs",
+      "sha256": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde"
+    },
+    {
+      "path": "apps/research-workbench/quality/dependency-exceptions.json",
+      "sha256": "74b27d286687fd36644d0e54ba4e8d73711bceba988a23dc54aeccdd7ba85032"
+    },
+    {
+      "path": "apps/research-workbench/README.md",
+      "sha256": "6332bc031ce22a72bc6ee7d3df73756deea2eff16f1f3256c5d9c27d03c70d53"
+    },
+    {
+      "path": "apps/research-workbench/scripts/build-stamp.mjs",
+      "sha256": "bb8bf2d2c1f3ca386f653345888434dacd10a94779d09fae2fbec00c206d4019"
+    },
+    {
+      "path": "apps/research-workbench/scripts/real-pdf-geometry-benchmark.mjs",
+      "sha256": "e66de14059d851d985259a06af1a7df08cfe268d0374fc34ed29e16c4220782a"
+    },
+    {
+      "path": "apps/research-workbench/scripts/serve-local.mjs",
+      "sha256": "29d1b7304274bef8855fd9a7f808f763937b5392332bba8b983960a925d68a37"
+    },
+    {
+      "path": "apps/research-workbench/tests/behavior.test.mjs",
+      "sha256": "d349bc319bbdfea5bc4c68b811f997fded12d54c9e05868efb5592d4e3eadc08"
+    },
+    {
+      "path": "apps/research-workbench/tests/build-stamp.test.mjs",
+      "sha256": "8e01c2ec3ba77818d17aec08fe4d9e25feef05e63b03bd2443483c54a31ddbe9"
+    },
+    {
+      "path": "apps/research-workbench/tests/candidate-release.test.mjs",
+      "sha256": "8a72bef430c180fc1d426b9dfc0451fb09049645be562396e864df0a20acfd6a"
+    },
+    {
+      "path": "apps/research-workbench/tests/local-server.test.mjs",
+      "sha256": "bf5d271ed196b8851f11efbabf1b6f6adab8ca612f902076b19d4942936d58d5"
+    },
+    {
+      "path": "apps/research-workbench/tests/manuscript-workspace.test.mjs",
+      "sha256": "2d02bd9d460454513ef2fad8d1bf97b54e253273ecd7b5026e9b96cc71293921"
+    },
+    {
+      "path": "apps/research-workbench/tests/reading-desk.test.mjs",
+      "sha256": "a19e2bd22cea627bfcace907c0c53a9aa9878eef005fe916575ea0f9097a1af3"
+    },
+    {
+      "path": "apps/research-workbench/tests/rendered-html.test.mjs",
+      "sha256": "908088e286a8ada2b704c6973ee1d8db1cf69b93ba78b384fbeddb6567ad65e2"
+    },
+    {
+      "path": "apps/research-workbench/tooling/sites-vite-plugin.ts",
+      "sha256": "4f193b59204bf7486d68889f8aae8c835bc4ea34153fb9e51519cdd176e93402"
+    },
+    {
+      "path": "apps/research-workbench/tsconfig.json",
+      "sha256": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3"
+    },
+    {
+      "path": "apps/research-workbench/vite.config.ts",
+      "sha256": "879dab9ce9d3d1dcf81e62787ce56929563b2045c82a61d3eecc8f47c2c6469a"
+    },
+    {
+      "path": "apps/research-workbench/worker/index.ts",
+      "sha256": "0e8e3c7cd9651f237e728a8d3862ec5206dd8fbceebeb9918809b100bdef7d2e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ae0e305a3ed29220e7aebf8027a6461fa59336ef2454626bdf2e6715a5556ebf"
+    },
+    {
+      "path": "environment-scholar.yml",
+      "sha256": "4131a54732dbaebb0a43d8255c656d27151fd4642e0e8b48d52971dce85f85a8"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/adapter.py",
+      "sha256": "4d2754664a404d53e761bc824ebab8be057176e104bad7bb7ee64c6b0c0f00ce"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/extension.ts",
+      "sha256": "dcc62d93af228aafeaa417177a75bbf5f7817062c508b4b9f67a62eea22bf63e"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/grant.mjs",
+      "sha256": "0e0789d0fe5ce79171d6326b73d86db4585b48459274642cd5c00d2a9a5bcb4f"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/operations.py",
+      "sha256": "667f48e591706e699a594855949c8f6b9a70072e5925a5a6421b43e92305d114"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/package.json",
+      "sha256": "b0539ea2b56965658919c66fc811c4a6b9026e7314f73d527c9ad6105a59b506"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/skills/library-read/SKILL.md",
+      "sha256": "21409c8008c165eae148a9da63544683bf88e1ebcf4187ae2c8eaca1d7dd4911"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/library-read/tools.ts",
+      "sha256": "7ff0b2c4b25ebe3621c941781477921cfba5dcfeab31edb78e6f15a631eca462"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/adapter.py",
+      "sha256": "12b0fadabbefdea3e8affbb7f224faf6f0a47f58f831e2b50b6d30ddc151f50c"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/extension.ts",
+      "sha256": "245b79fb77d9b0b3574446ffdbbdaba3c7a7dbd234e485cb2c949122335ee3e8"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/grant.mjs",
+      "sha256": "839654eef615c2e6f4e89e27732f9840ddc6c279428c0817eda10f50a6e5e2d1"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/operations.py",
+      "sha256": "2dfe78b49ca6c498feefb17e05729eb6e949bc125abebedad69e49e5b3ace1e5"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/package.json",
+      "sha256": "5ce5b092bce68faa2d3810b8f47d6ef443bc8bed37e593861c5b7c621e634a66"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/skills/note-project/SKILL.md",
+      "sha256": "1329405b036b885b934b3500b7022b49123dac0824f1680981c174c8989d3e73"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/tools.ts",
+      "sha256": "8f90ac8815307f5340230738ad797aa79fa7bc257f63b518839e4827387591f6"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-project/transport.ts",
+      "sha256": "46a0b04823a766b4e5e01ca19a6784294c08055c1af6adc00dd58b8c43d6ceef"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/adapter.py",
+      "sha256": "5592abad25e9fc959cc4483b1f437c2dc8f083b66dc235c6172eccd8bb10f70b"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/extension.ts",
+      "sha256": "dcfb21ebd3c9048b7267da215585a40a0faed8539cc1a6af1a4856b8c0710985"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/grant.mjs",
+      "sha256": "324a4ab4d408171c16f25c83997d89aac3ce0f5605f4d58667fa6553f1c22422"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/operations.py",
+      "sha256": "704c088fd77985822b10844c367d789bd055a83508b9002ff220645a46e777dc"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/package.json",
+      "sha256": "1a077605c00befff896f91336cdf1580ecdea72daa68f63bdbb9975f5b81ec4e"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/skills/note-write/SKILL.md",
+      "sha256": "e8e65cca1b21934aa4a6627cdc630fb57e2be3561cc065f1a4da15e7f9a0b390"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/tools.ts",
+      "sha256": "81977e6e5964ceecdb05e81d77f5d4c1f8dab649d35ab2589a6231cfc9c55666"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/note-write/transport.ts",
+      "sha256": "6812a0b580f90fc1d6f8323558df95f9cf56a83183a6b890c6ed3d496b12595d"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/adapter.py",
+      "sha256": "71f7538915ec4dac004091c9eaabb3be1b65f26c24655bd10e803ad6aa78fbbb"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/extension.ts",
+      "sha256": "66e0cbacc1d9825889c277c9eda3ef9e7a05ffab050a495498a6eb768a9bb700"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/operations.py",
+      "sha256": "ad94377c2391f463dc50a4e6638904db3e253d4bf6bf4413f9043a9cc7d09e7e"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/package.json",
+      "sha256": "bad47755c6b3a43efe6fff11533312cef1103c4ac6d30ec49f0fc763e2c5fece"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/skills/paper-read/SKILL.md",
+      "sha256": "0971ff8d40624c554ea7a8f274438a47d2798f17aa015e82ad9aaa8d53e59b54"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/tools.ts",
+      "sha256": "98c742b61017af83807685ff63c5023abefffed14cf029ba1c2b892e834442b7"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/paper-read/transport.ts",
+      "sha256": "0fae153818c3696099fef6805b10882e30eaf17df49b41b5c3529fc67d9ae105"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/adapter.py",
+      "sha256": "a8d92142b5f8d784c507106fe24f8de515dc7642477301d35a66c1a7346e74df"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/extension.ts",
+      "sha256": "45b7c30724e7bae860a3ea3534e02f40ec60377ed12513aac7f5d0c9cc1e8802"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/grant.mjs",
+      "sha256": "2cd8622c9c21be61541fc2a369b021b1d3c411b118d009a2b4c56d823a563c57"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/operations.py",
+      "sha256": "4b2c7b1d29a5ce4298f4950d1d5dd28295f3a66d82f06fbeab0780f6dc9fb372"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/package.json",
+      "sha256": "d7edebd279e6ebbe4c4bbdf6148d0ad72a0fb651c2b94d35a5072dbe528cbebe"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/skills/pdf-note/SKILL.md",
+      "sha256": "f19ac26dc2a22a57ac7aa24eb4fd5c012620a7250793fa228e8df895bca7f649"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-note/tools.ts",
+      "sha256": "802b99e5bf6b87862472e15038bc54425ba780985f7601d2602a4b51fb7d6724"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/adapter.py",
+      "sha256": "08069d2d1627ae0329032fb34f273ecfd16a587c9d777a6d7c487790a217df3a"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/extension.ts",
+      "sha256": "0d6c11ec2a4e1a371d29e2c5eba4a18623c48bf6e0bee5a99f6e5167976755f0"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/grant.mjs",
+      "sha256": "16a583438285d8b8114ebdc981f80ce846124a375d1ddf31620afa850bd91631"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/operations.py",
+      "sha256": "e0a37154e84ee8f3657d17d3ef163a4d92835079fbc7fb845c390e8de43496e9"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/package.json",
+      "sha256": "e93d0c464fe2ac766b0aabe6cb5337e851f3b61b2c5184e60b176d8e450c14c1"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/skills/pdf-read/SKILL.md",
+      "sha256": "f79f5248e68f7cb9a9631d5356ae313e798ae6f33e7c01bff1bbfa0bd74afa02"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/pdf-read/tools.ts",
+      "sha256": "904eaf817de5425fe620452aac8247f6ac7865ad8591fa3d11fcdc268cd801c1"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/adapter.py",
+      "sha256": "a614c94c4a677a74a5ae2d9136aa993a0b8d56d314fac01be9271b9fa2310eda"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/extension.ts",
+      "sha256": "e6eb13d5d5872294d123e9611672927d4d57f4cc571cae0c7dd0618bba0cd41e"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/grant.mjs",
+      "sha256": "865049d0543c074a3e15184fdf2efcfcd5b0c8ff3770ad9c2b966f6d6c701667"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/operations.py",
+      "sha256": "dc3766fdced4e417c4abe6b988589a58e2ea66dc93fb9a97e8dace60bbe846c0"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/package.json",
+      "sha256": "3864ad2d1c72ec4a368e2765f6dcaada1f9cc51e1992b3d3dede463cdf6ca812"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/skills/project-write/SKILL.md",
+      "sha256": "75631f81d70efa4191005cc3f3275bad6d4bd5fe5be6190ef99d403e5a0a1ccf"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/tools.ts",
+      "sha256": "bdcfa593408a03c5fda156bd8fda9178b8ffca3b62562b810b70b28b235d4e73"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/project-write/transport.ts",
+      "sha256": "499be21b412f746646f0303c2f856b28e9897fd75407bf8fa34a1a6328e6a043"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/adapter.py",
+      "sha256": "8365dac3fca8c0347a95ccba88cc2ec48dfc393c0fe5c0c29c881764d2472d3f"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/extension.ts",
+      "sha256": "68b9a4a2c5e69718ab480087c810404adeaaa6001d5a6ee01ca14a2029b5036b"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/grant.mjs",
+      "sha256": "18c96c4f52cb56306468b423db05611883b58410fe02404708604fd8cb9245ed"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/operations.py",
+      "sha256": "ca80e3b787082b56f1db628db06352a200d0e0db839c896c2c574a4eeb1f9c3b"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/package.json",
+      "sha256": "d9e10b180fe238a4e1a44061eca46e8026330b00a52ac953aa6f80e278f6d3c7"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/skills/research-continuity/SKILL.md",
+      "sha256": "a14f73d052e1dfe76b22a2f4a4589303a38df61b0a74b0cbf4e77f8aee4eaaa4"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-continuity/tools.ts",
+      "sha256": "44ba7801c4e2b2077d0d17f8ca5de0fa0bf381c4c769734ba8ae421f20a2fab1"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-workflow/grant.mjs",
+      "sha256": "791c0a6fe53a96b06953ad19afbde915cc41fdac5b232696269bfb812ba358ac"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-workflow/package.json",
+      "sha256": "6dd654b1259f3aeb068ddfd48499d912eb307721d74121767d3814f91ce5e911"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-workflow/skills/research-workflow/SKILL.md",
+      "sha256": "ffd7776197d1f063aedca5dd98db95850d432e2d0aa25bf73b80560e7ec1d529"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/research-workflow/tools.ts",
+      "sha256": "39431551b90f34d3dc51fb1a8bbc1888cd7a708659a9369a8334461663b514de"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/adapter.py",
+      "sha256": "a65e5ea5b2216ce7adfd5dd5dfa44ebe552cd1430f9ef40e8838d3daaa60192c"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/extension.ts",
+      "sha256": "274b2a0f27f711df47ac8cc660a7f94e242908988ab3c7134d7a4b489477e7fa"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/grant.mjs",
+      "sha256": "0e5e1fe23ef1ed855802bdfb620b0a9ed5a00dbedbf8d154a05697160d83b274"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/operations.py",
+      "sha256": "db189ae44ef136fb1c5acd76155262136636a49ccbc0983c9c5ff3632573f871"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/package.json",
+      "sha256": "8aa6289bbf9edc881bd56959a546f0e4ce410502d5bbcd1240623a1dc8c2a852"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/skills/task-write/SKILL.md",
+      "sha256": "6512cb9753fa073e8a9ffba59f9514fc71c8918954b16ff89a0876f51a6f2468"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/tools.ts",
+      "sha256": "d3df447ccb683ce2ce588c96ee4874d995f14c45efe49d7803aaa5325558cdf1"
+    },
+    {
+      "path": "packages/scholarflow-pi/capabilities/task-write/transport.ts",
+      "sha256": "b152444b68818e22cbfccc541548f63a16ee87c6e6ab5867c32022a7b8a4b3ca"
+    },
+    {
+      "path": "packages/scholarflow-pi/compatibility/runtime-policy.json",
+      "sha256": "9f41fb8ff659afc366f1a6c173e4581097104cd7056c68fafd2b9b052118c733"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/bridge.ts",
+      "sha256": "4ba72b743e68b83bb9e8ff7d34f41bb2888b7b71dffff82ac88a5722f90d2d81"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/execution-audit.js",
+      "sha256": "5c4c7c6232a6e9df24b2726c037c3b2e75c4a83eae109355760621a1bdbb8bb2"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/index.ts",
+      "sha256": "26ce7dfd046f648db7d873557c01ba77dc9bdebe852c5c95bbb3e2071ac4ef89"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/lifecycle.ts",
+      "sha256": "ea77330443bcb93ec59e52f892f26ccee93795574949b41616203b9ee17d718f"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/pi-compat.ts",
+      "sha256": "4f78a9fb32b105cd1eecca49d11c55e66e5ae874d2a2e032200190b622bc78f1"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/project-resolution.js",
+      "sha256": "fb574792f2bef0ce3fd2157e3e6b17432c96cf40e9a67616e93b87dec1b03eb9"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/research-worker-contract.js",
+      "sha256": "9da249879e7e4e06f5bd00ab9f1d2cb5f2be92c628450986f93a382a7011b30c"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/research-workers.ts",
+      "sha256": "5f808df3fbd55856e431a69f2ee41fe0432b4d35013ebb2bf98709e873712a78"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/routing.js",
+      "sha256": "431847bf37bcad0fdf54eed7d10bc47802d74a6117c316b7014254691126c071"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/scholarly-search.js",
+      "sha256": "544da6e5e2194ba45cbf06f840ed822774d2c9a576c5038f8a2256f696c04f57"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/task-contract.js",
+      "sha256": "cf389461fa0e711eaf311f9e1e80e77631df69422706e8ada3b2df15e4c85d20"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/tool-utils.ts",
+      "sha256": "02ffb1542f45c8d0b1d28f257e454cc85b38b6d0712d0ae515d752f1c6ac823b"
+    },
+    {
+      "path": "packages/scholarflow-pi/extensions/turn-context.js",
+      "sha256": "be4fdafd6d306524f052bf0f6066a10866eb0ce1308c27fd5410cb1e8ae3f604"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/composition.mjs",
+      "sha256": "14f871cb3b7e2a3bc1e68755be37243bc0eed0e6540c3fa609eb6a2e6731db9c"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/library-request.mjs",
+      "sha256": "99b19305bec80c641b60cf1d21d7f2b1c121a1bdf22874ee5897255b15bbd43f"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/operation-client.ts",
+      "sha256": "0264f34787303ccd04dc9458a311f2462578b57c9fa097afeec434f684ef39d0"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/operation_runner.py",
+      "sha256": "393160e5e4892c09d1910fae76aa5e737dfd48d5712a0a3961df13cd9d0f233d"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/python-runtime.mjs",
+      "sha256": "2435f17872946815a8a12bdbbb29c283f10043366450a4a9afee968df649069c"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/readonly.ts",
+      "sha256": "434cf558e99d8283924cc5aaa48b6c3f3bc8f4970292ffbd0a6d64d33583f1e4"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/research-runtime.mjs",
+      "sha256": "272c5d087ec99e1a5e4cdb75a71093f13e934ea7039c620c93f0e01f9ea8e1d6"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/write-client.ts",
+      "sha256": "c0a187e30c04a47ae11169e7379bb9228dc12c45e4be7ee1a2ea30bbb51592fb"
+    },
+    {
+      "path": "packages/scholarflow-pi/package-lock.json",
+      "sha256": "d7c69d16e7e83db0a50ebf92b651e7460e906176e5a9f078b108772bffc75bb5"
+    },
+    {
+      "path": "packages/scholarflow-pi/package.json",
+      "sha256": "1cfd05be73d16611cb2cd6a347f14aa8374a39f0c3959b9ee856cf737203e6cf"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/extension.ts",
+      "sha256": "31e872a545f085f44a2b6271304c8cf8cf43465fffae3f51877c506e44b0bc13"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/operations.py",
+      "sha256": "ac2b2488c1eebf68fdd7b287ffce7b7edac2ec29cc8582f89a45686a3e752568"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/package.json",
+      "sha256": "b8137dc5af8075708f5bf065cebfe1a344ce8b089f17887d0ef2fab50ca647d3"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/project-evidence.ts",
+      "sha256": "67d44179ea48be42ff7343e60011f7fd4a878a6dcd10c01955f910f313526233"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/project-scope.js",
+      "sha256": "a692c793cd48c63807e33ae8bc42e8121634feb1f2a535a26def27f27b9a209b"
+    },
+    {
+      "path": "packages/scholarflow-pi/profiles/minimal/skills/project-evidence/SKILL.md",
+      "sha256": "7cacc744e46594f4ec1c2e5097acf0eb14cef307a033e812793ac29aafa47959"
+    },
+    {
+      "path": "packages/scholarflow-pi/providers/local-qwen/builtin-tools.mjs",
+      "sha256": "4a8fc8f412efb91f9ced1623e772495ec5ceadc389417b51a7fa7c2f6352539d"
+    },
+    {
+      "path": "packages/scholarflow-pi/providers/local-qwen/config.mjs",
+      "sha256": "d90701898fc70ba457f16c5ee0f944bd63167f49fb41d2d04d6be047ef19fe0a"
+    },
+    {
+      "path": "packages/scholarflow-pi/providers/local-qwen/extension.ts",
+      "sha256": "ca5e4a2ed51b0a000f1550c77791f1ec40036f59f22774ebdd721d39ab130bde"
+    },
+    {
+      "path": "packages/scholarflow-pi/providers/local-qwen/status.mjs",
+      "sha256": "a0f525f81655355cbe840cd9458631e0958e45df83c6fe94521d7d7fae40d4ac"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/ask-library-safety.test.mjs",
+      "sha256": "6d1994af96226a5449525372b3c5cd38ba73511f57c49574d8c11cc448165f3a"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/context-routing-cases.json",
+      "sha256": "6851efc8b2f026dd36c07a96284bb3f8552d88e571a576ec7095cac0ae1ab3cb"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/ecosystem-manifest.json",
+      "sha256": "a2fcb5a34a0912fd2c649a89648b43f5e8e9a75648fd833be970ca12b202ced7"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/fixtures/local-qwen-echo.ts",
+      "sha256": "db2aa7f48a1bca8a98a4459d0d0ec387bf009f1780af894d3964e8931c5161d1"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/fixtures/local-qwen-protocol.ts",
+      "sha256": "a15e47a0dcfce036b623dce8c7a7de18d222a4a90838097a07683decdf29aa1c"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/information-duties-v1.json",
+      "sha256": "207cea58174881ecaf9207f75fc931586ef8c8225e71d376f5e659c6931f64b3"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/knowledge-engine-manifest.json",
+      "sha256": "8864bc64c096e6e26086264cd72b91fbcec961d8902e6208223d6787b18a163b"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/observer-trace-cases.json",
+      "sha256": "dc0e891f3388dfc3bb233f765aa71426a080ba2f5ca1e5dfa9f25325f74bfd53"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/pi-task-contract-four-exits-v1.json",
+      "sha256": "a10fcdd9f4e5229ebdf01677b486385a792c42ea01857974782c2a981bf811b0"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/project-create-outcomes-v4.json",
+      "sha256": "e8e13296627a0f1d276ae4003e93b24f4262727b962831e555641751f77bb5d3"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/python-runtime.test.mjs",
+      "sha256": "1d35d97e7c6618e6a2e004ee52d1202817ae59fb4b13b6a1ac68e649c28fc79c"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/research-workers.test.mjs",
+      "sha256": "63bbd3da32c345aecd722d8245637688716bc72827259adb07cdca2d2c743e6b"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/retrieval-corpus.json",
+      "sha256": "7df5a1f2b4f855a9d663996b3dc0aedc48fc45b4d2cec91651a7217197395929"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/routing.test.mjs",
+      "sha256": "198e12e4c5916866cdc4bf99f841fdd4ff258e7aa7710726ec359d844e3ac3c7"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/skill-fixtures.json",
+      "sha256": "c8a1d4222ba1b50731898d11c2a8e8286815080cf0cef08cd8a4967dd85c440a"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/skill-lock.json",
+      "sha256": "1c9003403d53c799ce1fc3e54b1da313b49bce9fa8980b9487fef27a6e347dc0"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/ask-library.mjs",
+      "sha256": "bd5b0c852249e6ebd84baebb1149b64518127e5c114851e1fefe0c3a800df9f6"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/assert-node-runtime.mjs",
+      "sha256": "5d5f75c62a2b2897c146be704d7d37d69292334b394f97fa74e8e216564a82e4"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/bridge_runner.py",
+      "sha256": "9ffdb3380e0ddbf82b6c1d0c836a86c03705915abaa9c9f4dd65b16e569a1cc1"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/check-local-qwen-imports.mjs",
+      "sha256": "7ea042d4eec1f07dcd703f4031af1e6b330f4714c65b5721cb7734801c60ef2c"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/eval-scoring.mjs",
+      "sha256": "b992e38c7396faa127830b9162eba4ed028c8d02b7cfa9122f4efbbb5ef88d8c"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/evaluate-skills.mjs",
+      "sha256": "cfe7cfcd5eb386bc6461ee90203de1b48c944ed9cfe36008a3b59c8c5aca3cb5"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/research-chat.mjs",
+      "sha256": "7d0408efbc1b98e2e2692c165a6339545aa551c00ac978c15c61ce2dc472ce34"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/run-with-pinned-node.mjs",
+      "sha256": "6b772087605fd4e0107d1c4cd703cf3b3b0f2402ba58338145a9c02d64d89639"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/seed-eval-store.py",
+      "sha256": "5d06f9420fc0df2217edda7c08544487dbb92efdac08f93e4e38b63a6587111f"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/validate-skills.mjs",
+      "sha256": "48d5b68139f5c5b49e091024d71476f290b7e552672f10f2b98b104fc4e44692"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/web-research-turn.mjs",
+      "sha256": "fff04173cafdae8aaef7696856c46ea7412b76f07ded8e0793faeab6f39b0baf"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-automation-inbox/agents/openai.yaml",
+      "sha256": "eddd65d2c191a9daf255fb1183d47b94ea1aefb5c0fa42a86075f6f5854e9d78"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-automation-inbox/SKILL.md",
+      "sha256": "c6c6257e8d1db239b38722cf1aeaeb640cd0161faa21b9343a7a803f9352bb5a"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-daily-review/agents/openai.yaml",
+      "sha256": "dbc8c1dbf7d1258060c8c7b8827b2a47f6eeae66e5690517c51970a68acb31b6"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-daily-review/SKILL.md",
+      "sha256": "fea5ed05f6a4bf5bf1363d47ca3cf6d406a15cca544611bd09635b80c56dd280"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-experiment-log/SKILL.md",
+      "sha256": "32f223818e17123935a11aad33ec7d7f9cbe7867e2e639549d1a799fa72775e8"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-literature-synthesis/agents/openai.yaml",
+      "sha256": "5358a52c702e029e9a1647849559b2dc6dcb6bc7c9a02def74006693fab59941"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-literature-synthesis/SKILL.md",
+      "sha256": "1cee3d20147bd7d8ebf7712e4a86c96ef22f9ba77ee4e60077f4012e1d947dd5"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-manuscript-writing/agents/openai.yaml",
+      "sha256": "c93cccb913fe97607bde5ca4f25a3b95f3f03a9a0450ec585e370371329e62a2"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-manuscript-writing/SKILL.md",
+      "sha256": "d81117e13648f30822f461c5ded930d7591ba985b7b30261e0f0f1249b5dd3c4"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-open-research/SKILL.md",
+      "sha256": "7bb315c317dba9ce11457f7ef2d5a1337ae07d180360a00f7b198c52d4449890"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-paper-triage/SKILL.md",
+      "sha256": "73731c396ae106bdfa4e9678b959b96c4827a846a8087cb1bbe8d88ba7859c71"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-project-bootstrap/agents/openai.yaml",
+      "sha256": "b1bc8246e162abcd4f5e0d8d67f36f5b1c0989e45592948faabc24270ee36e87"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-project-bootstrap/SKILL.md",
+      "sha256": "9fe684e38c8de2481423e5ccf27ebd2748c7850960200a1b17891bcb62756451"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-project-context/SKILL.md",
+      "sha256": "b3db941e408014c0748bb296918d078cbcc3b62c763d2622f74a6793a3faa789"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-research-intake/SKILL.md",
+      "sha256": "a632f388158214e02e96891a0c5ef61450aa6ca15ddbac242b38712adfbee82a"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-research-plan/agents/openai.yaml",
+      "sha256": "86c39c4d17548e5869e6ad79a8588de82e97f059c8f8cf9b0051057a562f1f29"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-research-plan/SKILL.md",
+      "sha256": "3945e5d9c604ba053f79910d570e135d318a0240bacc564b3156931884d4478f"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-simulation-analysis/agents/openai.yaml",
+      "sha256": "766e5adb9497ddc14a9ee7fb5270df271ce4cf3d74e53743d1f4f93106c3ce3e"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-simulation-analysis/SKILL.md",
+      "sha256": "f31a85e8d4c3e9d1311e020a2a9e5d96f6e760d44a0c25ba677b7e35c4e9288d"
+    },
+    {
+      "path": "packages/scholarflow-pi/skills/scholarflow-weekly-review/SKILL.md",
+      "sha256": "abdd0faa8eca08bad087fd4e05b009c3559a604b102eee1e0e7b7c6a6fa04676"
+    },
+    {
+      "path": "packages/scholarflow-pi/vendor/nature-skills/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "packages/scholarflow-pi/vendor/nature-skills/SOURCE.json",
+      "sha256": "88c0413348b9256a167f2789213657e68f3d98938e4ce17ca160fbb4122c3361"
+    },
+    {
+      "path": "requirements-scholar.txt",
+      "sha256": "b9252430041f20038aaa4cd7e16818251d25e8777129d254dfc27a60d140ba13"
+    },
+    {
+      "path": "ScholarFlow-Desk.bat",
+      "sha256": "daa24c6117db0eaa2797e3159d39d912c49ee15b801fa0961b97eced3bedd801"
+    },
+    {
+      "path": "scholarflow/__init__.py",
+      "sha256": "753ba604bbc8d2a0812fccb563ce5a229a7f05c5e43c3051d7a1c21b41adcedd"
+    },
+    {
+      "path": "scholarflow/__main__.py",
+      "sha256": "a8a835a4b5bf4b5a0b223e070306410713aca11435d63c914c9a30720264fd5d"
+    },
+    {
+      "path": "scholarflow/agent_observer.py",
+      "sha256": "54ef5f2e12e345d78ce20d13656712cba29b6aca462e4bd3e3a732ffc87d678f"
+    },
+    {
+      "path": "scholarflow/confirmation_store.py",
+      "sha256": "0883e45c70c50d035d65c34aaeb0e6b11be93997520ca2a41e691ad67d8b1768"
+    },
+    {
+      "path": "scholarflow/consistency.py",
+      "sha256": "c0ba4d47f0eb0f071e7ed7445aba95637c009da24a2ad1d058084f7b4a3f63f0"
+    },
+    {
+      "path": "scholarflow/context_router.py",
+      "sha256": "abdb3e806ca14b001cc57940e5a490366bd0a4241eb99c88bb2bbb9657437d0a"
+    },
+    {
+      "path": "scholarflow/contracts.py",
+      "sha256": "ee8bd3e76418aecffd148de393fac4cf7113e4e11818ea1f505547770a2f1e83"
+    },
+    {
+      "path": "scholarflow/conversation.py",
+      "sha256": "7d88e5c79ba79c621792adc089084879b6feb94fddd9db08a87b7d5fe21ed384"
+    },
+    {
+      "path": "scholarflow/dependency_gate.py",
+      "sha256": "8b9c81c1d7165b4943c611d35b5e46d48317c0efdd94bd414d54c6b89c56ebfb"
+    },
+    {
+      "path": "scholarflow/domain_queries.py",
+      "sha256": "197978160cb7275147b67ce517e9493606c33678dc04eaf80588db42078082e6"
+    },
+    {
+      "path": "scholarflow/enums.py",
+      "sha256": "aaddae10c67bc9910b216e944f45eb54e1ddf0df3d538f004feec9d5efb54c51"
+    },
+    {
+      "path": "scholarflow/event_bus.py",
+      "sha256": "16dca8754fa30301f39e164fe67990324d772abceb29a58ffbe48f74a8133698"
+    },
+    {
+      "path": "scholarflow/evidence.py",
+      "sha256": "a9fb8b054cd99f6c12950d985a0a29a2767d207f6dc85789697ab2c476a80945"
+    },
+    {
+      "path": "scholarflow/experiment_observer.py",
+      "sha256": "558e240dfe09710000d495952ba1eb5384f2359b1a375d214683fc59bd6ec558"
+    },
+    {
+      "path": "scholarflow/exporters.py",
+      "sha256": "fdc6b88f35073a11e64ec148351960234f60aacb0b973268899d7808bcf0b2d9"
+    },
+    {
+      "path": "scholarflow/gateway.py",
+      "sha256": "dd80deb28d33126a4c8740abbff3e8d16b44344111ccfe5d8d07d8ffda65f16c"
+    },
+    {
+      "path": "scholarflow/governed_writes.py",
+      "sha256": "5451c8bf16aa04419036f1300a9e1c6a62174c04a917cec7e62b329eef5beb1c"
+    },
+    {
+      "path": "scholarflow/intake.py",
+      "sha256": "fd043caf3db1976d00ae7d7c894e7336c1e26d53308f4eefa918e41cb7b0f1b9"
+    },
+    {
+      "path": "scholarflow/job_store.py",
+      "sha256": "c5c9871ec0faa0f5012c9c1bd90d6eaf91070fd20b90904a4b35af23a93148bf"
+    },
+    {
+      "path": "scholarflow/kb_constitution.py",
+      "sha256": "ccfae67f28cb2ffc2dc003e5400d8ca97e4a611fb5fa322db0b48650ad99d27b"
+    },
+    {
+      "path": "scholarflow/kb_target_resolver.py",
+      "sha256": "89813d46744a37b6273e0ef395afc28649bebf0986bcd43d12f33419f16b260b"
+    },
+    {
+      "path": "scholarflow/kb_write_policy.py",
+      "sha256": "6528975c98818cc33f146a80b9c62c95fdf8ee49d374ac1e914b3d30312f4687"
+    },
+    {
+      "path": "scholarflow/kb_write_validator.py",
+      "sha256": "1fe254693572235943da5cbff95fb5329aa4738b6e5565a5d4636cfaded477bb"
+    },
+    {
+      "path": "scholarflow/knowledge_candidates.py",
+      "sha256": "37dacd157d940711e6082113c1f6b59fd5030213e1a24a765ef1950c47d48c15"
+    },
+    {
+      "path": "scholarflow/knowledge_engine.py",
+      "sha256": "4d08635da0feee699be15909222ff297762639f087d4b402bc5246433f2e0230"
+    },
+    {
+      "path": "scholarflow/knowledge_ingestion.py",
+      "sha256": "71d6f764c6eccd18fd70bb8d6239d0c7d2525895a5620f23c5f75ae142035a75"
+    },
+    {
+      "path": "scholarflow/knowledge_jobs.py",
+      "sha256": "2739f25c4fe0207f180d6b965ff0b2e34d4d0dc98f8f4926e5fbab4aacd8eba1"
+    },
+    {
+      "path": "scholarflow/knowledge_sync.py",
+      "sha256": "c94f8ff14832cbb3c1a2397195eba9ed8767970f152f97420290df0b705b4292"
+    },
+    {
+      "path": "scholarflow/library_answers.py",
+      "sha256": "6bf3f7e82f7875615e1e5e3a810ab2ba855403c6ce5eac021a5f2ec890a076e6"
+    },
+    {
+      "path": "scholarflow/library_delta.py",
+      "sha256": "d5a2950465e2c0200dbdb7780fdd12a21963e1164051e86b5ff54f7eea112f2e"
+    },
+    {
+      "path": "scholarflow/library_projects.py",
+      "sha256": "e40a75e9268f9d801517d9d0b5a993b33210666c2c7e300b1558bd1af2826b9d"
+    },
+    {
+      "path": "scholarflow/literature_search.py",
+      "sha256": "347c7416fcf7fe4381843e85e05e39650686f6b83ddda53cbd5c2522487e996f"
+    },
+    {
+      "path": "scholarflow/manuscript.py",
+      "sha256": "1ad26ab58f4cdb1e54de4f6f02cf40e48abe8de94590e703c33a25a8f0a2f826"
+    },
+    {
+      "path": "scholarflow/memory_audit.py",
+      "sha256": "b91b53adefa925a5843fc05da5481a1261f9a37b37b5b11437938e14222ad9ad"
+    },
+    {
+      "path": "scholarflow/models.py",
+      "sha256": "e24db08ff2f42fd7971ba488ac0ae387b9e734185b8c03db7299074dab4460e1"
+    },
+    {
+      "path": "scholarflow/mutations.py",
+      "sha256": "4d10423717a8cf3748adc6d82cfd8ff506c3ea5122ec163706da13815a57d17d"
+    },
+    {
+      "path": "scholarflow/note_projection.py",
+      "sha256": "34620b99f3b8f4aca1cea91a628dddb39686a4346fc33983d366074f570d25ac"
+    },
+    {
+      "path": "scholarflow/obsidian_sync.py",
+      "sha256": "bc7b0d9e74ca20efa8813d90fca5568f6ce4ec7cac8c12674dbf2459b0c2d911"
+    },
+    {
+      "path": "scholarflow/paper_service.py",
+      "sha256": "5692921608427b627c42cc13703f28b05bc6d7b74f1da4b339f5f4a10f25707f"
+    },
+    {
+      "path": "scholarflow/pdf_notes.py",
+      "sha256": "f77d477248187de6cc4c6c074882fc11de1a1c5b9c1a92f568ff76c855440655"
+    },
+    {
+      "path": "scholarflow/pdf_reading.py",
+      "sha256": "b2e3a5d73bac60f9cdee4cc0a3d6dd6398f02736d286b4e9942fe867fad50c51"
+    },
+    {
+      "path": "scholarflow/persistence.py",
+      "sha256": "951864522aad4ff58eb2cddb757a3599b93f37e89b5aab5f6757fae54139de14"
+    },
+    {
+      "path": "scholarflow/pi_bridge.py",
+      "sha256": "66fd63ffa8947817424995207dba5b0d6de0bfce04c5de6eb2bfd01d5a3553cd"
+    },
+    {
+      "path": "scholarflow/pi_cli.py",
+      "sha256": "bb3a06cbf9c122ad78dcbd3b79b209deb67f695f6479a85558fe958036e787a0"
+    },
+    {
+      "path": "scholarflow/pi_lifecycle.py",
+      "sha256": "df2e28c70b2ef2c9cb5fae7e9aecb77b727c07990ce8b268a00968c006101018"
+    },
+    {
+      "path": "scholarflow/pi_rpc_host.py",
+      "sha256": "bc0dd7e915f9273edccce1358153f9d8737adc9625c689c6cd49ba038f389474"
+    },
+    {
+      "path": "scholarflow/project_knowledge.py",
+      "sha256": "0d1411bfd6f0c5666109a3744f4ce9af156edf7cce7e6c8f592120f6e929e2c8"
+    },
+    {
+      "path": "scholarflow/proposal_state.py",
+      "sha256": "eeb7e337c017cfc7952ac8fe21dc1de7739ae4485b6e157f8db55d6698dfd046"
+    },
+    {
+      "path": "scholarflow/quality.py",
+      "sha256": "1d4680e7eedd2685f2f3c0ec6cef22f288148f624d4e58ca7ecfff46c2c0ef28"
+    },
+    {
+      "path": "scholarflow/read_http.py",
+      "sha256": "4b0ce8a41ed1f2351f6d2282a49ba19caf3f226ed840565e7560f80ab32b8320"
+    },
+    {
+      "path": "scholarflow/read_operation_registry.py",
+      "sha256": "667067fe485ffa15419418b9f8367e5d1861b62a3ccf1e6a533076f5543867f7"
+    },
+    {
+      "path": "scholarflow/read_operations.py",
+      "sha256": "407ac3e7bafa35d853cc0bbda3a4dc3161c3db6abd8980bf25761bc8db14c2ba"
+    },
+    {
+      "path": "scholarflow/reader_translation.py",
+      "sha256": "43d5e3bdf78a50381e17213882535bbc389bb9782c8a39feb78e34191575da56"
+    },
+    {
+      "path": "scholarflow/reader_workspace.py",
+      "sha256": "a6aa92ca932383f0ab1073e6996683325ab64c32198735d1265c0c7b55cf3b3c"
+    },
+    {
+      "path": "scholarflow/remote_pdf.py",
+      "sha256": "03500f7f1d790c1e318ceb58da2dbd9fe67e0a91786dba690bd8977d0e12797e"
+    },
+    {
+      "path": "scholarflow/research_continuity.py",
+      "sha256": "f526aac04b54db59b61bf0efbb42fa0d25e48665db727f96a4efb9c48f275cb4"
+    },
+    {
+      "path": "scholarflow/research_http.py",
+      "sha256": "a7ea3bc5724e4a8718190964cb32d721e67b9863fee46df5c7c7d7c250253e30"
+    },
+    {
+      "path": "scholarflow/research_mutations.py",
+      "sha256": "ef2b8cb7fbfade88b367eee22fd5d6f42916e5185c207668e09c8aecbb59233e"
+    },
+    {
+      "path": "scholarflow/research_workflow.py",
+      "sha256": "e21b93d57e1b0bae966c74cfee5bdcf0b12f38672c92d426bacf56b30df09a34"
+    },
+    {
+      "path": "scholarflow/research_workspace.py",
+      "sha256": "cc405afd15dc620db20e1895c65bab683974bc4349fd2aff0fe2219546503159"
+    },
+    {
+      "path": "scholarflow/retrieval.py",
+      "sha256": "577be72fb91f9501e1490964fb0b123ab9d3e617d3fd1af8f962de43715f8f36"
+    },
+    {
+      "path": "scholarflow/retrieval_evaluation.py",
+      "sha256": "1885c7de9c1ade879359e90663c98bda9bf33ced71d0ae560fe9543103158c67"
+    },
+    {
+      "path": "scholarflow/runtime_supervisor.py",
+      "sha256": "8c41a1f4cee92e96a66c0b68ea4b0db5cf63ed686b96e24c5125a7a3aa01060e"
+    },
+    {
+      "path": "scholarflow/scheduler.py",
+      "sha256": "ef4647b0b59deb5cac4ff81cc9bf9a3717605fb1b68ab30161310fc105e5e8e6"
+    },
+    {
+      "path": "scholarflow/scientific_document.py",
+      "sha256": "2a7baaa7704456413648d956dd845359f38d4a6924795013ceece4278009bf1f"
+    },
+    {
+      "path": "scholarflow/source_notes.py",
+      "sha256": "fa617022a87e3d945b5a4d101909d7bdd3a279fb306da498ea53380ac199feaf"
+    },
+    {
+      "path": "scholarflow/storage.py",
+      "sha256": "950df3322c120eb69d384fe59c944045bc15d85a4e8be6bdf3f56d6a1eda1d51"
+    },
+    {
+      "path": "scholarflow/vault_automation.py",
+      "sha256": "ff7f7558e13081fa9bb25fab9853c74a7e3b8349dc73ccc63055befe030f4318"
+    },
+    {
+      "path": "scholarflow/vault_projection.py",
+      "sha256": "5393b979c7796f5b50875254a5636103aca247ee47b2648e3e041331c887cfb0"
+    },
+    {
+      "path": "scholarflow/web_research.py",
+      "sha256": "f1834503e14b27e167ea259c7895cd9d0817f626f364e7fff3233e2ded1b43a6"
+    },
+    {
+      "path": "scholarflow/workbench_agent.py",
+      "sha256": "451aa7b9525c6da6e3fedb269f79aa38dbc6c76250b6645a04da9a84105a4875"
+    },
+    {
+      "path": "scholarflow/workbench_api.py",
+      "sha256": "06e44273bf2018876254dc26eb63dd8df03d1c0d7a1cb82cc35d9acee7abd034"
+    },
+    {
+      "path": "scholarflow/workbench_telemetry.py",
+      "sha256": "ff2853a81094ba32fd949e979fbf67dceb5cec44c0707cae80dba1ce602a701d"
+    },
+    {
+      "path": "scholarflow/workspace_knowledge.py",
+      "sha256": "73990f6e2cf79cfa698e3d9f843fe37c4f2e94b88b730b1994c5923c3c0e6b5d"
+    },
+    {
+      "path": "scholarflow/zotero_client.py",
+      "sha256": "22b7b4d525f2fee8deb4daf41840f6fa8fbded9905457a68526785636d8cf0fb"
+    },
+    {
+      "path": "scholarflow/zotero_mutations.py",
+      "sha256": "5c4f58d8569bab3ea0ee17f1eb6d1819f0c6527c8fd6dc4de1ec859f9db403cb"
+    },
+    {
+      "path": "scripts/harness_note_write_api.py",
+      "sha256": "2cec6ae20ffb9860d7aab3d5f0461fddd0396d8dbfe4d82fe658c0a8197e249e"
+    },
+    {
+      "path": "scripts/harness_project_write_api.py",
+      "sha256": "2e055664f0b3fb3d0cba22d07d6fd9717763c737c5e09f9a63cb3a26ccc0d6be"
+    },
+    {
+      "path": "scripts/harness_read_api.py",
+      "sha256": "06561da81ff5a850c6ed3a8c7dc16e982ea28c43a688b327411a0abb6f5b07d7"
+    },
+    {
+      "path": "scripts/harness_task_write_api.py",
+      "sha256": "731d73c3ac417d4a6c7de24db590ec0ace6ba4172a7d89e0ccb25cd113597734"
+    },
+    {
+      "path": "scripts/knowledge_runtime.ps1",
+      "sha256": "6cc3e91bf72ce8ec5c9cdce3cb5bddac9f4da95d4df83a9c7b22dadfa9284443"
+    },
+    {
+      "path": "scripts/knowledge_stack.ps1",
+      "sha256": "a5986fded969fda5a4c5bf3415f53a63f9b1979b0ca4d98e3377da02daa281c6"
+    },
+    {
+      "path": "scripts/library-delta.py",
+      "sha256": "48cf6206b696af7ef5ff69bd90b5cf3790a63c088e76c9619b4eec0b1aa030ab"
+    },
+    {
+      "path": "scripts/library_knowledge.py",
+      "sha256": "a25ae7e02a5d369aaa1e9ab1a36f6090725cec460f58e8de9b739f007dc5aa54"
+    },
+    {
+      "path": "scripts/node_runtime.ps1",
+      "sha256": "d8ccb6ca4ab06262c664760f3254b5dab0919cb5ba69af47f83d37c2bc8f6ade"
+    },
+    {
+      "path": "scripts/open-research-desk.ps1",
+      "sha256": "9fe04910aeca508b51c378207c1cd9a82d88ea684758f900eadfc019e0865ae8"
+    },
+    {
+      "path": "scripts/prepare-local-embedding-gpu.ps1",
+      "sha256": "1f054fab44c37b3dad46982cd4bc041827f693857dd1c891517ccdd57dfcec24"
+    },
+    {
+      "path": "scripts/python_runtime.ps1",
+      "sha256": "85156429d9ec33598011c6dd8548f5aab653019431e1e02828f7281a77a84b83"
+    },
+    {
+      "path": "scripts/render_library_answer.py",
+      "sha256": "6ee4d89ed8c5e94a14700d4ea47de8a27637d1ec88866ef2013ed605d6c3f21b"
+    },
+    {
+      "path": "scripts/research-desk-runtime.ps1",
+      "sha256": "1044965cfea17e0a3456fd28f24e79e1960628e351f4c0f793cad6a553e618a3"
+    },
+    {
+      "path": "scripts/research-library.ps1",
+      "sha256": "70f60082745e0bb4134dfcdf32a47dd81ffd6f51557dfb5a509a80681aa0ee49"
+    },
+    {
+      "path": "scripts/research-workspace.py",
+      "sha256": "c2618553b00bd779b2284c3666886a745e8a236c6be052f7c6131422228db9d4"
+    },
+    {
+      "path": "scripts/research_library.py",
+      "sha256": "0d2a95560668302c67d138ba4e4a7d83bd9abde7f168cc2c67a0319b89056433"
+    },
+    {
+      "path": "scripts/run_library_support.py",
+      "sha256": "93184c6a634c3cac9f2eafea2acb095064c01bd0e024f9f6f665b9f2c76ab911"
+    },
+    {
+      "path": "scripts/scaffold_skill.py",
+      "sha256": "31fbde69a3f7609f2c2a0c8ee76ecc22f72003372843b00778998ac31b9c9247"
+    },
+    {
+      "path": "scripts/scholarflow-local.ps1",
+      "sha256": "f82b516bf4d429ab5a6308cf5f4f04c99569dccae19201b2e93143888a29d0c2"
+    },
+    {
+      "path": "scripts/scholarflow-minimal.ps1",
+      "sha256": "0f39fafe0631f645ce1c8ae67b70ffec258e39d1b6fc4bd51dad497b58a074c5"
+    },
+    {
+      "path": "scripts/workbench_browser_checks.js",
+      "sha256": "3010cc9a60f04b4ace599c290d098050ee569a031ddf0519220817648c6ba06f"
+    },
+    {
+      "path": "scripts/workspace-knowledge.py",
+      "sha256": "16b71821905e8ba0de81813c47ddf13ed53a27bf8729fba18c48361e4b291612"
+    },
+    {
+      "path": "tests/fixtures/embedding_budget_proxy.py",
+      "sha256": "7dc00bd5d96981fd0af2b7695b5b3c0cf1f150ef07676ec4e227301c1f260efb"
+    },
+    {
+      "path": "tests/fixtures/launcher-other-checkout/workbench.ps1",
+      "sha256": "fc17a00bb5ddeb965e2af97c0c16153b876a056a681526c39e76c7816a092f09"
+    },
+    {
+      "path": "tests/fixtures/research_desk_fixture.py",
+      "sha256": "b663bd3ddf1442c9c1332092e3e1b2c77487361e6f96638cc1a9f65a3090d47d"
+    },
+    {
+      "path": "tests/test_embedding_budget_proxy.py",
+      "sha256": "d46e346a6ebf8afd853502b1367ecd6229062281c99f75c16dd55fea35a0f704"
+    },
+    {
+      "path": "tests/test_research_continuity.py",
+      "sha256": "7a470add77e39d960bd6177e0fdf81bee132492981cc27eaf887a0c2cee32a11"
+    },
+    {
+      "path": "tests/test_research_desk_launcher.py",
+      "sha256": "024cfee8abf095f052a2481b0ca792030bf1e1d0bd71118e5ed1e30326126f47"
+    },
+    {
+      "path": "tests/test_research_host.py",
+      "sha256": "52cdd11c2e243262b2516158210125371a0013c6e5c84da4f3308d7d052f81b7"
+    },
+    {
+      "path": "tests/test_research_http_security.py",
+      "sha256": "05f71e45a0085e9b233d4cc0983d9a8a2754763dad2904b5d12757c40f2c7e81"
+    },
+    {
+      "path": "tests/test_research_workspace.py",
+      "sha256": "6d771f3b6dbf378b6b00af1c59964cd02387f8efa261c8e98e8e5d69f87c0ef4"
+    },
+    {
+      "path": "tests/test_web_research_loop.py",
+      "sha256": "89021ed749942ce0d7f62c318aad4990910f4e0573effd7d54a026b2044b5bf1"
+    },
+    {
+      "path": "tests/test_workspace_knowledge.py",
+      "sha256": "825761ccd13c049bf45c0e4ddee798dd3757ade5ca83f4ce2152ddfd7651250f"
+    }
+  ],
+  "scope": "selected_source_preview",
+  "verification": "see README for validation boundaries"
+}

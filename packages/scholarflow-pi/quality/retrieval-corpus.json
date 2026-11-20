@@ -1,0 +1,190 @@
+{
+  "schema_version": 2,
+  "description": "Curated bilingual, cross-domain scientific retrieval protocol corpus. Text is ScholarFlow-authored and carries synthetic page/section anchors; the online LightRAG runner is the production-quality gate.",
+  "documents": [
+    {
+      "ref": "paper:perovskite-stability",
+      "source_type": "paper",
+      "title": "Interfacial passivation for stable perovskite solar cells",
+      "detail": "Defect passivation suppresses non-radiative recombination while limiting moisture-driven degradation.",
+      "snippet": "<!-- sf-anchor block=p1 page=4 section=Results kind=paragraph --> Operational stability improves after ammonium-based interface passivation. marker-perovskite-41",
+      "record_json": "{\"paper_id\":\"paper:perovskite-stability\",\"page\":4,\"section\":\"Results\"}"
+    },
+    {
+      "ref": "paper:crispr-offtarget",
+      "source_type": "paper",
+      "title": "Genome-wide measurement of CRISPR off-target editing",
+      "detail": "Guide-RNA mismatch position and chromatin accessibility jointly affect unintended cleavage.",
+      "snippet": "<!-- sf-anchor block=p2 page=7 section=Off-target analysis kind=paragraph --> GUIDE-seq detects low-frequency off-target double-strand breaks. marker-crispr-72",
+      "record_json": "{\"paper_id\":\"paper:crispr-offtarget\",\"page\":7,\"section\":\"Off-target analysis\"}"
+    },
+    {
+      "ref": "paper:battery-sei",
+      "source_type": "paper",
+      "title": "Solid electrolyte interphase evolution in lithium metal batteries",
+      "detail": "Cryogenic microscopy resolves an inorganic-rich SEI associated with more uniform lithium deposition.",
+      "snippet": "<!-- sf-anchor block=p3 page=5 section=Microscopy kind=paragraph --> The observed lithium fluoride domains correlate with reduced dendritic growth. marker-sei-53",
+      "record_json": "{\"paper_id\":\"paper:battery-sei\",\"page\":5,\"section\":\"Microscopy\"}"
+    },
+    {
+      "ref": "paper:topological-photonics",
+      "source_type": "paper",
+      "title": "Disorder-robust edge transport in a photonic lattice",
+      "detail": "A non-trivial band gap supports edge-localized optical propagation around defects.",
+      "snippet": "<!-- sf-anchor block=p4 page=6 section=Edge transport kind=paragraph --> Transmission remains high around a deliberately removed resonator. marker-edge-64",
+      "record_json": "{\"paper_id\":\"paper:topological-photonics\",\"page\":6,\"section\":\"Edge transport\"}"
+    },
+    {
+      "ref": "paper:single-cell-batch",
+      "source_type": "paper",
+      "title": "Batch-aware integration of single-cell transcriptomes",
+      "detail": "Latent-variable alignment preserves rare cell populations while reducing donor-specific batch effects.",
+      "snippet": "<!-- sf-anchor block=p5 page=9 section=Benchmark kind=paragraph --> Rare dendritic cells remain separable after cross-donor integration. marker-scrna-95",
+      "record_json": "{\"paper_id\":\"paper:single-cell-batch\",\"page\":9,\"section\":\"Benchmark\"}"
+    },
+    {
+      "ref": "paper:climate-attribution",
+      "source_type": "paper",
+      "title": "Event attribution for extreme heat",
+      "detail": "Counterfactual ensembles estimate how anthropogenic forcing changes the probability of a heatwave.",
+      "snippet": "<!-- sf-anchor block=p6 page=3 section=Attribution method kind=paragraph --> The risk ratio compares factual and counterfactual event probabilities. marker-climate-36",
+      "record_json": "{\"paper_id\":\"paper:climate-attribution\",\"page\":3,\"section\":\"Attribution method\"}"
+    },
+    {
+      "ref": "paper:quantum-surface-code",
+      "source_type": "paper",
+      "title": "Logical error suppression with a surface code",
+      "detail": "Increasing code distance suppresses logical errors when physical gate noise remains below threshold.",
+      "snippet": "<!-- sf-anchor block=p7 page=8 section=Logical performance kind=paragraph --> Distance scaling provides the central fault-tolerance test. marker-qec-87",
+      "record_json": "{\"paper_id\":\"paper:quantum-surface-code\",\"page\":8,\"section\":\"Logical performance\"}"
+    },
+    {
+      "ref": "paper:retrieval-grounding",
+      "source_type": "paper",
+      "title": "Retrieval grounding for scientific question answering",
+      "detail": "Hybrid sparse and dense retrieval improves evidence coverage, while reranking improves first-result relevance.",
+      "snippet": "<!-- sf-anchor block=p8 page=11 section=Retrieval evaluation kind=paragraph --> Recall at five and reciprocal rank are reported separately from answer faithfulness. marker-rag-118",
+      "record_json": "{\"paper_id\":\"paper:retrieval-grounding\",\"page\":11,\"section\":\"Retrieval evaluation\"}"
+    },
+    {
+      "ref": "paper:protein-structure",
+      "source_type": "paper",
+      "title": "Confidence-aware protein structure prediction",
+      "detail": "Per-residue confidence identifies flexible regions that should not be interpreted as a single rigid conformation.",
+      "snippet": "<!-- sf-anchor block=p9 page=10 section=Confidence kind=paragraph --> Low-confidence loops require ensemble or experimental validation. marker-protein-109",
+      "record_json": "{\"paper_id\":\"paper:protein-structure\",\"page\":10,\"section\":\"Confidence\"}"
+    },
+    {
+      "ref": "paper:phase-field-fracture",
+      "source_type": "paper",
+      "title": "Phase-field simulation of brittle crack propagation",
+      "detail": "The regularization length controls diffuse crack width and must be resolved by the finite-element mesh.",
+      "snippet": "<!-- sf-anchor block=p10 page=12 section=Mesh convergence kind=paragraph --> Element size below half the length scale stabilizes the crack path. marker-fracture-1210",
+      "record_json": "{\"paper_id\":\"paper:phase-field-fracture\",\"page\":12,\"section\":\"Mesh convergence\"}"
+    }
+  ],
+  "queries": [
+    {
+      "query": "which treatment improved perovskite operational stability",
+      "relevant_refs": ["paper:perovskite-stability"],
+      "required_markers": ["marker-perovskite-41", "page=4"],
+      "forbidden_refs": ["paper:battery-sei"],
+      "language": "en",
+      "category": "paraphrase",
+      "vector_scores": {"paper:perovskite-stability": 1.0}
+    },
+    {
+      "query": "如何检测低频 CRISPR 脱靶双链断裂",
+      "relevant_refs": ["paper:crispr-offtarget"],
+      "required_markers": ["marker-crispr-72", "page=7"],
+      "forbidden_refs": ["paper:protein-structure"],
+      "language": "zh",
+      "category": "cross-lingual",
+      "vector_scores": {"paper:crispr-offtarget": 1.0}
+    },
+    {
+      "query": "lithium fluoride domains and dendrite suppression",
+      "relevant_refs": ["paper:battery-sei"],
+      "required_markers": ["marker-sei-53", "page=5"],
+      "forbidden_refs": ["paper:perovskite-stability"],
+      "language": "en",
+      "category": "fine-grained",
+      "vector_scores": {"paper:battery-sei": 1.0}
+    },
+    {
+      "query": "光子晶格绕过缺陷的边缘传输",
+      "relevant_refs": ["paper:topological-photonics"],
+      "required_markers": ["marker-edge-64", "page=6"],
+      "forbidden_refs": ["paper:phase-field-fracture"],
+      "language": "zh",
+      "category": "cross-lingual",
+      "vector_scores": {"paper:topological-photonics": 1.0}
+    },
+    {
+      "query": "preserve rare cell populations during donor batch correction",
+      "relevant_refs": ["paper:single-cell-batch"],
+      "required_markers": ["marker-scrna-95", "page=9"],
+      "language": "en",
+      "category": "paraphrase",
+      "vector_scores": {"paper:single-cell-batch": 1.0}
+    },
+    {
+      "query": "factual versus counterfactual heatwave probability risk ratio",
+      "relevant_refs": ["paper:climate-attribution"],
+      "required_markers": ["marker-climate-36", "page=3"],
+      "language": "en",
+      "category": "method",
+      "vector_scores": {"paper:climate-attribution": 1.0}
+    },
+    {
+      "query": "surface code distance scaling below physical error threshold",
+      "relevant_refs": ["paper:quantum-surface-code"],
+      "required_markers": ["marker-qec-87", "page=8"],
+      "language": "en",
+      "category": "method",
+      "vector_scores": {"paper:quantum-surface-code": 1.0}
+    },
+    {
+      "query": "检索召回率和答案忠实度为什么要分开评估",
+      "relevant_refs": ["paper:retrieval-grounding"],
+      "required_markers": ["marker-rag-118", "page=11"],
+      "language": "zh",
+      "category": "cross-lingual",
+      "vector_scores": {"paper:retrieval-grounding": 1.0}
+    },
+    {
+      "query": "low confidence protein loops need experimental validation",
+      "relevant_refs": ["paper:protein-structure"],
+      "required_markers": ["marker-protein-109", "page=10"],
+      "language": "en",
+      "category": "fine-grained",
+      "vector_scores": {"paper:protein-structure": 1.0}
+    },
+    {
+      "query": "有限元网格如何解析相场断裂正则化长度",
+      "relevant_refs": ["paper:phase-field-fracture"],
+      "required_markers": ["marker-fracture-1210", "page=12"],
+      "forbidden_refs": ["paper:topological-photonics"],
+      "language": "zh",
+      "category": "cross-lingual",
+      "vector_scores": {"paper:phase-field-fracture": 1.0}
+    },
+    {
+      "query": "hybrid sparse dense retrieval reranking first result",
+      "relevant_refs": ["paper:retrieval-grounding"],
+      "required_markers": ["marker-rag-118"],
+      "language": "en",
+      "category": "hard-negative",
+      "vector_scores": {"paper:retrieval-grounding": 1.0}
+    },
+    {
+      "query": "mesh convergence for diffuse crack width",
+      "relevant_refs": ["paper:phase-field-fracture"],
+      "required_markers": ["marker-fracture-1210"],
+      "forbidden_refs": ["paper:quantum-surface-code"],
+      "language": "en",
+      "category": "hard-negative",
+      "vector_scores": {"paper:phase-field-fracture": 1.0}
+    }
+  ]
+}

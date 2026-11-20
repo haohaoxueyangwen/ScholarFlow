@@ -1,0 +1,35 @@
+{
+  "contract_id": "project-create-outcomes-v4",
+  "schema_version": 1,
+  "doc": "docs/architecture/project-create-outcomes-contract-v4.md",
+  "fixture_suite": "project-create-outcomes-v4",
+  "outcomes": [
+    {
+      "code": "create_proposal",
+      "propose_create": "required",
+      "summary": "Distinct scope with sufficient paper evidence → one pending create proposal"
+    },
+    {
+      "code": "reuse_existing",
+      "propose_create": "forbidden",
+      "summary": "Equivalent existing stage → cite stage_id and reuse; no create"
+    },
+    {
+      "code": "clarify",
+      "propose_create": "forbidden",
+      "summary": "Similar but unresolved equivalence → one clarifying question"
+    },
+    {
+      "code": "evidence_gap",
+      "propose_create": "forbidden",
+      "summary": "No suitable stored papers → report gap; no invented evidence"
+    }
+  ],
+  "dedup_clues_only": ["similar_name", "shared_paper_id"],
+  "dedup_must_compare": ["goal", "research_object", "deliverables", "scope"],
+  "backend": {
+    "exact_stage_id_conflict": "id_conflict",
+    "pending_id_reservation": "id_reserved",
+    "apply_replay": "idempotent_replay"
+  }
+}

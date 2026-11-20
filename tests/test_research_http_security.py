@@ -1,0 +1,152 @@
+"""HTTP boundary tests using synthetic data and an ephemeral loopback server."""
+import http.client
+import json
+import threading
+import unittest
+from urllib.parse import quote
+
+from scholarflow.research_http import ResearchHTTPServer
+
+
+class SyntheticService:
+    data = "synthetic"
+
+    def __init__(self):
+        self.previews = 0
+
+    def projects(self):
+        return {"items": [{"stage_id": "synthetic-project"}]}
+
+    def preview_project(self, value):
+        self.previews += 1
+        return {"received": value}
+
+    def read_pdf(self, import_id):
+        if import_id != "synthetic-pdf":
+            raise ValueError("unknown synthetic fixture")
+        return "中文阅读.pdf", b"%PDF-1.4\nsynthetic\n%%EOF"
+
+
+class ResearchHTTPSecurityTests(unittest.TestCase):
+    origin = "http://127.0.0.1:3000"
+
+    def setUp(self):
+        self.service = SyntheticService()
+        self.server = ResearchHTTPServer(self.service, port=0)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.addCleanup(self._stop)
+
+    def _stop(self):
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join(timeout=5)
+
+    def request(self, method, path, *, headers=None, body=None):
+        connection = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)
+        try:
+            connection.request(method, path, headers=headers or {}, body=body)
+            response = connection.getresponse()
+            return response.status, dict(response.getheaders()), response.read()
+        finally:
+            connection.close()
+
+    def session(self):
+        status, headers, _ = self.request("GET", "/session", headers={"Origin": self.origin})
+        self.assertEqual(status, 200)
+        self.assertIn("HttpOnly", headers["Set-Cookie"])
+        self.assertIn("SameSite=Strict", headers["Set-Cookie"])
+        return headers["Set-Cookie"].split(";", 1)[0]
+
+    def test_health_is_public_but_project_data_requires_session(self):
+        status, _, body = self.request("GET", "/health")
+        self.assertEqual(status, 200)
+        self.assertNotIn("data_dir", json.loads(body))
+        status, _, _ = self.request("GET", "/projects", headers={"Origin": self.origin})
+        self.assertEqual(status, 403)
+
+    def test_health_reports_launcher_instance_identity_without_paths(self):
+        server = ResearchHTTPServer(self.service, port=0, instance_id="instance-123")
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=5)
+            try:
+                connection.request("GET", "/health")
+                response = connection.getresponse()
+                self.assertEqual(json.loads(response.read()), {"status": "ok", "service": "scholarflow-research", "instance_id": "instance-123"})
+            finally:
+                connection.close()
+        finally:
+            server.shutdown(); server.server_close(); thread.join(timeout=5)
+
+    def test_trusted_session_can_read_and_pdf_style_get_without_origin(self):
+        cookie = self.session()
+        status, headers, body = self.request("GET", "/projects", headers={"Origin": self.origin, "Cookie": cookie})
+        self.assertEqual(status, 200)
+        self.assertEqual(headers.get("Access-Control-Allow-Origin"), self.origin)
+        self.assertEqual(headers.get("Access-Control-Allow-Credentials"), "true")
+        self.assertEqual(json.loads(body)["items"][0]["stage_id"], "synthetic-project")
+        status, _, _ = self.request("GET", "/projects", headers={"Cookie": cookie})
+        self.assertEqual(status, 200)
+
+    def test_origin_prefix_spoof_cannot_get_session_or_cors(self):
+        for origin in ("http://localhost.attacker.example", "http://127.0.0.1.attacker.example", "null", "http://localhost:3001"):
+            with self.subTest(origin=origin):
+                status, headers, _ = self.request("GET", "/session", headers={"Origin": origin})
+                self.assertEqual(status, 403)
+                self.assertNotIn("Access-Control-Allow-Origin", headers)
+                status, headers, _ = self.request("OPTIONS", "/projects", headers={"Origin": origin})
+                self.assertEqual(status, 403)
+                self.assertNotIn("Access-Control-Allow-Origin", headers)
+
+    def test_missing_origin_cannot_establish_session(self):
+        status, _, _ = self.request("GET", "/session")
+        self.assertEqual(status, 403)
+
+    def test_untrusted_origin_cannot_use_existing_session(self):
+        cookie = self.session()
+        status, headers, _ = self.request("GET", "/projects", headers={"Origin": "http://localhost.attacker.example", "Cookie": cookie})
+        self.assertEqual(status, 403)
+        self.assertNotIn("Access-Control-Allow-Origin", headers)
+
+    def test_host_rebinding_is_rejected(self):
+        status, _, _ = self.request("GET", "/health", headers={"Host": f"attacker.example:{self.server.server_port}"})
+        self.assertEqual(status, 403)
+
+    def test_mutations_require_origin_session_intent_and_json(self):
+        cookie = self.session()
+        base = {"Origin": self.origin, "Cookie": cookie, "Content-Type": "application/json", "X-ScholarFlow-Intent": "confirm"}
+        body = b'{"project_name":"synthetic"}'
+        for missing in ("Origin", "Cookie", "X-ScholarFlow-Intent"):
+            headers = dict(base)
+            headers.pop(missing)
+            status, _, _ = self.request("POST", "/projects/preview", headers=headers, body=body)
+            self.assertEqual(status, 403, missing)
+        wrong_type = dict(base, **{"Content-Type": "text/plain"})
+        status, _, _ = self.request("POST", "/projects/preview", headers=wrong_type, body=body)
+        self.assertEqual(status, 400)
+        self.assertEqual(self.service.previews, 0)
+        status, _, _ = self.request("POST", "/projects/preview", headers=base, body=body)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.service.previews, 1)
+
+    def test_preflight_only_accepts_trusted_origin(self):
+        status, headers, _ = self.request("OPTIONS", "/projects", headers={"Origin": self.origin})
+        self.assertEqual(status, 204)
+        self.assertEqual(headers.get("Access-Control-Allow-Origin"), self.origin)
+        self.assertIn("X-ScholarFlow-Intent", headers.get("Access-Control-Allow-Headers", ""))
+
+    def test_chinese_pdf_filename_and_bytes_survive_http_response(self):
+        cookie = self.session()
+        try:
+            status, headers, body = self.request("GET", "/imports/synthetic-pdf/pdf", headers={"Cookie": cookie})
+        except http.client.RemoteDisconnected:
+            status, headers, body = None, {}, b""
+        self.assertEqual(status, 200)
+        self.assertEqual(body, b"%PDF-1.4\nsynthetic\n%%EOF")
+        self.assertIn("filename*=UTF-8''" + quote("中文阅读.pdf"), headers["Content-Disposition"])
+
+
+if __name__ == "__main__":
+    unittest.main()
