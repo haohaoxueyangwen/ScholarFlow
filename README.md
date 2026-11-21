@@ -26,10 +26,12 @@ neither a local model nor an external API is included in this repository.
   directories to an existing project, with optional discovery on agent start.
   Discovery does not itself read with a model or index any source. The legacy
   library launcher in this preview only permits its local embedding action.
-- The optional Nature writing skill can be installed locally from the pinned
-  upstream Git revision, checked against a reviewed content hash and explicitly
-  activated. Upstream skill files are not redistributed in this snapshot; their
-  own Apache-2.0 license and third-party materials remain applicable.
+- The optional pinned Nature Skills bundle contains 23 task instructions plus
+  shared resources and can be explicitly activated for Pi. The installer
+  verifies its content and keeps the previous version for rollback. Loading
+  instructions does not configure or authorize their scripts, MCP services,
+  browsers, external APIs or file writes. Upstream skill files are fetched
+  separately; their Apache-2.0 license and third-party notices remain applicable.
 - Windows is the current primary target. Python 3.11+, Node.js 22.19+, the
   project dependencies, a configured Pi provider, and separately provisioned
   knowledge services are required. Building has been checked in isolation with
@@ -57,9 +59,11 @@ existing upstream checkout (`nature install --checkout PATH`) or an explicit
 network fetch (`nature install --fetch`); activate the returned version with
 `nature activate --version VERSION`. Active content is revalidated before Pi
 loads it. Third-party skill instructions are not a security sandbox.
-`nature check` compares the pinned commit with upstream without changing the
-active version. A newer commit requires a new reviewed pin and content hash;
-there is no unattended upstream update in this preview.
+`nature check` compares the active and pinned commits with upstream without
+changing the active version. A newer commit requires a new reviewed pin and
+content hash; there is no unattended upstream update in this preview. If the
+network fetch times out, install from a local upstream checkout containing the
+pinned commit; its contents are verified in the same way.
 
 For example, in PowerShell after installation:
 
