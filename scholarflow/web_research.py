@@ -24,6 +24,22 @@ ID=re.compile(r'workspace-[a-f0-9]{32}\Z')
 TURN_ID=re.compile(r'turn-[a-f0-9]{32}\Z')
 
 
+def pi_worker_environment():
+    """Give a direct desktop launch the same optional Nature home as the CLI."""
+    env={**os.environ,'PYTHONUTF8':'1','PYTHONNOUSERSITE':'1','SCHOLARFLOW_PYTHON':sys.executable}
+    # An explicit value, including an empty string, is an operator override.
+    if 'SCHOLARFLOW_NATURE_HOME' not in env:
+        from .nature_skill_package import NaturePackageError, NatureSkillPackage
+        default=Path(env['LOCALAPPDATA'])/'ScholarFlow' if env.get('LOCALAPPDATA') else Path.home()/'.scholarflow'
+        home=Path(env.get('SCHOLARFLOW_HOME') or default).absolute()
+        try:
+            if NatureSkillPackage(home).status().get('active'):
+                env['SCHOLARFLOW_NATURE_HOME']=str(home)
+        except NaturePackageError as error:
+            raise RuntimeError('Nature Skill 校验失败；已停止本轮，请检查或回滚已安装版本。') from error
+    return env
+
+
 class WebResearchService:
     """A transport/operation adapter, never a second model or fact database."""
     def __init__(self, data_dir, home=None):
@@ -184,7 +200,7 @@ class WebResearchService:
                     prefix+='请读取 pdf-note Skill，先调用 sf_pdf_note_context(mode=create)，只依据其全部授权片段及精确 source_versions 生成一份待审阅的笔记提案；不得批准、写文件或声称已保存。不要增强原文结论，不确定之处明确标注；待审阅、未保存等会变化的操作状态只放在对话说明，不能写进笔记正文。最后简短说明待审阅并给出完整提案ID/hash；正文由网页审阅卡展示，无需重复。\n'
                 elif turn['mode']=='knowledge':
                     prefix+='请读取 library-read Skill，并先使用 sf_library_search 检索当前项目；只依据返回的当前证据回答并逐条标注真实 reference_id，缺证据明确说明。\n'
-                env={**os.environ,'PYTHONUTF8':'1','PYTHONNOUSERSITE':'1','SCHOLARFLOW_PYTHON':sys.executable}
+                env=pi_worker_environment()
                 completed=subprocess.run([node_command(),str(TURN),'--workspace',str(path)],input=json.dumps({'prompt':prefix+turn['message']},ensure_ascii=False),
                     cwd=ROOT,env=env,capture_output=True,text=True,encoding='utf-8',timeout=630)
                 if completed.returncode:

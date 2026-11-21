@@ -1159,7 +1159,7 @@
     },
     {
       "path": "scholarflow/web_research.py",
-      "sha256": "54721b157ce2f313bfcf1193b877a674064f397d4ea2cae599e6a0046be2f51c"
+      "sha256": "3262ba372400f6d088218cf81994322c21e41509fd160a60168ec1725748703b"
     },
     {
       "path": "scholarflow/workbench_agent.py",
@@ -1371,7 +1371,7 @@
     },
     {
       "path": "tests/test_web_research_loop.py",
-      "sha256": "e53d0fd64985652bdf23ac81aa25595e11292b59b4e6c49cdd543c5c2402938c"
+      "sha256": "91fc9ba1d88928e817bc666e7f2d125ff3853c3f36c18ba631b56c0b93ff05ce"
     },
     {
       "path": "tests/test_windows_process_parent.py",

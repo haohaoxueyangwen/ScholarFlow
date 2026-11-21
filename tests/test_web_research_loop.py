@@ -17,21 +17,36 @@ from scholarflow import ProjectStage,ScholarFlowStore,research_workspace as rw,w
 from scholarflow.domain_queries import DomainQueryError
 from scholarflow.reader_workspace import ReaderWorkspaceStore
 from scholarflow.persistence import atomic_write_json
-from scholarflow.web_research import WebResearchService
+from scholarflow.web_research import WebResearchService, pi_worker_environment
 from scholarflow.workbench_api import build_server
 from scripts import library_knowledge as kb
 
 class WebResearchTests(unittest.TestCase):
     def setUp(self):
         self.fixture=fixtures.WorkspaceTests();self.fixture.setUp()
+        self.env=patch.dict(os.environ,{'SCHOLARFLOW_HOME':str(self.fixture.root/'synthetic-agent-home')})
+        self.env.start();os.environ.pop('SCHOLARFLOW_NATURE_HOME',None)
         self.data=self.fixture.root/'workbench-data';self.store=ScholarFlowStore(self.data)
         for stage in ('stage-A','stage-a'):
             self.store.create_project_stage(ProjectStage(stage_id=stage,project_name='Same name',title='Synthetic',goal='Isolated test'))
         self.reader=ReaderWorkspaceStore(self.data)
         self.imported=self.reader.import_pdf('original-human-name.pdf',self.fixture.pdf.read_bytes(),project_stage_ids=['stage-A'])
         self.service=WebResearchService(self.data)
-    def tearDown(self):self.fixture.tearDown()
+    def tearDown(self):self.env.stop();self.fixture.tearDown()
     def create(self):return self.service.create({'stage_id':'stage-A','import_id':self.imported['import_id'],'pages':'1','provider':'deepseek'})
+    def test_web_worker_discovers_the_same_active_nature_home_as_cli(self):
+        with patch('scholarflow.nature_skill_package.NatureSkillPackage.status',return_value={'active':'v-synthetic'}):
+            env=pi_worker_environment()
+        self.assertEqual(env['SCHOLARFLOW_NATURE_HOME'],str(self.fixture.root/'synthetic-agent-home'))
+        self.assertNotIn('SCHOLARFLOW_NATURE_HOME',os.environ)
+    def test_explicit_empty_nature_home_disables_automatic_discovery(self):
+        with patch.dict(os.environ,{'SCHOLARFLOW_NATURE_HOME':''}),patch('scholarflow.nature_skill_package.NatureSkillPackage.status') as status:
+            self.assertEqual(pi_worker_environment()['SCHOLARFLOW_NATURE_HOME'],'')
+            status.assert_not_called()
+    def test_invalid_active_nature_stops_before_model_start(self):
+        from scholarflow.nature_skill_package import NaturePackageError
+        with patch('scholarflow.nature_skill_package.NatureSkillPackage.status',side_effect=NaturePackageError('changed')):
+            with self.assertRaisesRegex(RuntimeError,'Nature Skill'):pi_worker_environment()
     def test_upload_requires_explicit_supported_provider_before_writing(self):
         raw=self.fixture.pdf.read_bytes()
         for provider in (None,'','other'):
