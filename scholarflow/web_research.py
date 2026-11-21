@@ -269,11 +269,16 @@ class WebResearchService:
                 self._indexing.discard(workspace_id)
 
     def _index_commands(self, path):
-        start = subprocess.run(['powershell', '-NoProfile', '-File', str(ROOT / 'scripts/research-library.ps1'), '-Action', 'StartEmbedding'], cwd=ROOT, capture_output=True, timeout=120)
-        if start.returncode:
-            raise RuntimeError((start.stderr or b'').decode('utf-8', 'replace')[-300:] or '本机 Embedding 服务未就绪')
+        portable = os.environ.get('SCHOLARFLOW_PORTABLE_KNOWLEDGE') == '1'
+        if portable:
+            if not (wk.home_for(rw.load(path)) / 'embedding-runtime.json').is_file():
+                raise RuntimeError('请先显式配置本机 Embedding 服务；不会自动启动或复用未知服务')
+        else:
+            start = subprocess.run(['powershell', '-NoProfile', '-File', str(ROOT / 'scripts/research-library.ps1'), '-Action', 'StartEmbedding'], cwd=ROOT, capture_output=True, timeout=120)
+            if start.returncode:
+                raise RuntimeError((start.stderr or b'').decode('utf-8', 'replace')[-300:] or '本机 Embedding 服务未就绪')
         env = {**os.environ, 'PYTHONUTF8': '1', 'PYTHONNOUSERSITE': '1'}
-        done = subprocess.run([str(NATIVE), '-s', '-B', str(ROOT / 'scripts/workspace-knowledge.py'), 'run', '--workspace', str(path)], cwd=ROOT, env=env, capture_output=True, timeout=900)
+        done = subprocess.run([sys.executable if portable else str(NATIVE), '-s', '-B', str(ROOT / 'scripts/workspace-knowledge.py'), 'run', '--workspace', str(path)], cwd=ROOT, env=env, capture_output=True, timeout=900)
         if done.returncode:
             raise RuntimeError((done.stderr or b'').decode('utf-8', 'replace')[-300:] or '知识索引未完成，请检查本机 Embedding 和索引服务')
         return done

@@ -11,5 +11,5 @@ export default async function minimalHarness(pi: ExtensionAPI) {
     const module = await import(pathToFileURL(item.modulePath).href);
     capabilities.push({...module[item.factory](pi), skillPaths: item.skillPaths});
   }
-  installReadonly(pi, capabilities, composition.diagnostics);
+  installReadonly(pi, capabilities, composition.diagnostics, composition.natureResources);
 }

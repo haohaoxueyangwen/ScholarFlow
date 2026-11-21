@@ -17,10 +17,14 @@ def plan(project):
     kb.validate_stage(project)
     if project.startswith('stage-library-'):raise ValueError('An actual research project is required')
     with file_lock(HOME/'index-execution',timeout_seconds=1):
-        prior=kb.records();catalog=inventory()['records'];groups={}
+        prior=kb.records();snapshot=inventory();catalog=snapshot['records'];groups={}
+        configured=snapshot.get('source_mode')=='configured'
+        if configured:
+            from scholarflow.source_inventory import SourceInventory
+            catalog=SourceInventory.for_project(catalog,project)
         for path in (HOME/'indexes').glob('stage-library-*/active-sources.json'):groups.update(entries(path))
         # Event-driven notes are absent from external file discovery by design.
-        projected={k:v for k,v in entries(kb.state_path(project)).items() if not v.get('origin_artifact')};delta=build_delta(catalog,groups,projected)
+        projected={k:v for k,v in entries(kb.state_path(project)).items() if not v.get('origin_artifact') and (v.get('inventory_mode')=='configured')==configured};delta=build_delta(catalog,groups,projected)
         catalog_by_id={r['source_id']:r for r in catalog};selected=[catalog_by_id[k] for k in delta['upsert']]
         if sum(r['bytes'] for r in selected)>15_000_000 or sum(len(kb.source_chunks(r)) for r in selected)>10000:raise ValueError('Delta exceeds frozen H026 total budget')
         stage=ScholarFlowStore(HOME/'facts').get_project_stage(project)
@@ -53,7 +57,7 @@ async def apply(key,reviewed,operator):
             if frozen['revoked_records'] and not job.get('revocations_applied'):
                 link=binding_plan(HOME/'facts',frozen['revoked_records'],project,frozen['delta']['revoke'],revoke=True);apply_binding(HOME/'facts',link,reviewed_hash=plan_hash(link),operator=True)
                 with file_lock(HOME/'index-execution',timeout_seconds=1):
-                    path=kb.state_path(project);state=json.loads(path.read_text())
+                    path=kb.state_path(project);state=json.loads(path.read_text(encoding='utf-8'))
                     for source in frozen['delta']['revoke']:state['entries'][source]['revoked']=True
                     save(path,state)
                 job['revocations_applied']=True;job['expected_binding_hash']=kb.binding_hash(project);jobs.save(job)

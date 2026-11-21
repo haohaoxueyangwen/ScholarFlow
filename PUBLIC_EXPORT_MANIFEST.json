@@ -195,7 +195,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "ae0e305a3ed29220e7aebf8027a6461fa59336ef2454626bdf2e6715a5556ebf"
+      "sha256": "644216a55c13464186d3906566dce2083e917815482f5727f3135b9f491e5cac"
     },
     {
       "path": "environment-scholar.yml",
@@ -543,11 +543,15 @@
     },
     {
       "path": "packages/scholarflow-pi/harness/composition.mjs",
-      "sha256": "14f871cb3b7e2a3bc1e68755be37243bc0eed0e6540c3fa609eb6a2e6731db9c"
+      "sha256": "32e270fdfcf2072d29f1a1d88a60d1984c0fcead96cb52f5a4eecbfd70397c97"
     },
     {
       "path": "packages/scholarflow-pi/harness/library-request.mjs",
       "sha256": "99b19305bec80c641b60cf1d21d7f2b1c121a1bdf22874ee5897255b15bbd43f"
+    },
+    {
+      "path": "packages/scholarflow-pi/harness/nature-skill.mjs",
+      "sha256": "60ac25ad77e58a1021436655eaee491ca5c7498783f9087b795428ef7d2e82b0"
     },
     {
       "path": "packages/scholarflow-pi/harness/operation-client.ts",
@@ -558,16 +562,20 @@
       "sha256": "393160e5e4892c09d1910fae76aa5e737dfd48d5712a0a3961df13cd9d0f233d"
     },
     {
+      "path": "packages/scholarflow-pi/harness/provider-auth.mjs",
+      "sha256": "a760c07425a09c3986502addf0caa4b1701b08e1d708e2ac4a7a17ee63f52b61"
+    },
+    {
       "path": "packages/scholarflow-pi/harness/python-runtime.mjs",
       "sha256": "2435f17872946815a8a12bdbbb29c283f10043366450a4a9afee968df649069c"
     },
     {
       "path": "packages/scholarflow-pi/harness/readonly.ts",
-      "sha256": "434cf558e99d8283924cc5aaa48b6c3f3bc8f4970292ffbd0a6d64d33583f1e4"
+      "sha256": "c8971aba05a245a4d95d535c6a47eb31f9329bf1fd8d145c6d8d32f6da20dd36"
     },
     {
       "path": "packages/scholarflow-pi/harness/research-runtime.mjs",
-      "sha256": "272c5d087ec99e1a5e4cdb75a71093f13e934ea7039c620c93f0e01f9ea8e1d6"
+      "sha256": "612983a2c41c832b41e7a414d45a848c606219d6f8bf2183016514ae5159a718"
     },
     {
       "path": "packages/scholarflow-pi/harness/write-client.ts",
@@ -583,7 +591,7 @@
     },
     {
       "path": "packages/scholarflow-pi/profiles/minimal/extension.ts",
-      "sha256": "31e872a545f085f44a2b6271304c8cf8cf43465fffae3f51877c506e44b0bc13"
+      "sha256": "84eb561a478d33c0c24e4fc92f410d01b517ea0106f29cb60e661a518b5ba4ed"
     },
     {
       "path": "packages/scholarflow-pi/profiles/minimal/operations.py",
@@ -650,6 +658,14 @@
       "sha256": "8864bc64c096e6e26086264cd72b91fbcec961d8902e6208223d6787b18a163b"
     },
     {
+      "path": "packages/scholarflow-pi/quality/nature-skill-integration.test.mjs",
+      "sha256": "cfd1c311b59ab2ba3382844ac79dd5b416ddc356e3d73fa1e7adf1aecef76411"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/nature-skill.test.mjs",
+      "sha256": "b5afb5cdd9c8c16a57318be7e96d51055c813dc5f4c735c5b4352b8a6e6a4121"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/observer-trace-cases.json",
       "sha256": "dc0e891f3388dfc3bb233f765aa71426a080ba2f5ca1e5dfa9f25325f74bfd53"
     },
@@ -660,6 +676,10 @@
     {
       "path": "packages/scholarflow-pi/quality/project-create-outcomes-v4.json",
       "sha256": "e8e13296627a0f1d276ae4003e93b24f4262727b962831e555641751f77bb5d3"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/provider-auth.test.mjs",
+      "sha256": "2cee975adece686d537abde9b9c9d5b83eacfe4c6702a5fe2c34a61217594549"
     },
     {
       "path": "packages/scholarflow-pi/quality/python-runtime.test.mjs",
@@ -711,7 +731,7 @@
     },
     {
       "path": "packages/scholarflow-pi/scripts/research-chat.mjs",
-      "sha256": "7d0408efbc1b98e2e2692c165a6339545aa551c00ac978c15c61ce2dc472ce34"
+      "sha256": "971685b58c03f4d523c053d201264c11ca724766a0fe8cce62de6b477d98351f"
     },
     {
       "path": "packages/scholarflow-pi/scripts/run-with-pinned-node.mjs",
@@ -818,8 +838,16 @@
       "sha256": "88c0413348b9256a167f2789213657e68f3d98938e4ce17ca160fbb4122c3361"
     },
     {
+      "path": "requirements-knowledge.txt",
+      "sha256": "aeafa6a31b0333aff4f26661690c9e09d39b617e241ac87301bb8953f6b3b9fd"
+    },
+    {
       "path": "requirements-scholar.txt",
       "sha256": "b9252430041f20038aaa4cd7e16818251d25e8777129d254dfc27a60d140ba13"
+    },
+    {
+      "path": "ScholarFlow-Agent.bat",
+      "sha256": "07e49a4fb5ec52811da7c86672acc6a2d13b614f89c0b8c81d3b660d81c30802"
     },
     {
       "path": "ScholarFlow-Desk.bat",
@@ -970,6 +998,10 @@
       "sha256": "4d10423717a8cf3748adc6d82cfd8ff506c3ea5122ec163706da13815a57d17d"
     },
     {
+      "path": "scholarflow/nature_skill_package.py",
+      "sha256": "997406fe56f85f6470ae0f274e95bbf80dba4d5d7652c93a3e85c56dee55e03f"
+    },
+    {
       "path": "scholarflow/note_projection.py",
       "sha256": "34620b99f3b8f4aca1cea91a628dddb39686a4346fc33983d366074f570d25ac"
     },
@@ -1008,6 +1040,14 @@
     {
       "path": "scholarflow/pi_rpc_host.py",
       "sha256": "bc0dd7e915f9273edccce1358153f9d8737adc9625c689c6cd49ba038f389474"
+    },
+    {
+      "path": "scholarflow/portable_auth.py",
+      "sha256": "9cab4ee278ec3748a06c9877bbfe1ce650f958660e45a17144fa8af6e62752fd"
+    },
+    {
+      "path": "scholarflow/portable_knowledge.py",
+      "sha256": "4696371486e023bf52c6fa29f877493ca4d290c0bb5204487b1c21413c433875"
     },
     {
       "path": "scholarflow/project_knowledge.py",
@@ -1063,7 +1103,7 @@
     },
     {
       "path": "scholarflow/research_workspace.py",
-      "sha256": "cc405afd15dc620db20e1895c65bab683974bc4349fd2aff0fe2219546503159"
+      "sha256": "1fe27decfda30111a6ca5eb4e078dc824ab5b999cdb71939b61ac8fe3f203eb1"
     },
     {
       "path": "scholarflow/retrieval.py",
@@ -1086,6 +1126,10 @@
       "sha256": "2a7baaa7704456413648d956dd845359f38d4a6924795013ceece4278009bf1f"
     },
     {
+      "path": "scholarflow/source_inventory.py",
+      "sha256": "2ae1322025666b27660ba830cc9f9a25958e1c07dd20d6cce8e68def5dad3140"
+    },
+    {
       "path": "scholarflow/source_notes.py",
       "sha256": "fa617022a87e3d945b5a4d101909d7bdd3a279fb306da498ea53380ac199feaf"
     },
@@ -1103,7 +1147,7 @@
     },
     {
       "path": "scholarflow/web_research.py",
-      "sha256": "f1834503e14b27e167ea259c7895cd9d0817f626f364e7fff3233e2ded1b43a6"
+      "sha256": "05bcf5cf7c9bc2294835f83094cd21cbdff13fbd40de5243d42d61c0f2d4591e"
     },
     {
       "path": "scholarflow/workbench_agent.py",
@@ -1130,6 +1174,10 @@
       "sha256": "5c4f58d8569bab3ea0ee17f1eb6d1819f0c6527c8fd6dc4de1ec859f9db403cb"
     },
     {
+      "path": "scripts/build_portable_agent.py",
+      "sha256": "a6c41eb97832ee82b3d3b34ad36bd4b69394a011b9a0e219ea8e462f070a3173"
+    },
+    {
       "path": "scripts/harness_note_write_api.py",
       "sha256": "2cec6ae20ffb9860d7aab3d5f0461fddd0396d8dbfe4d82fe658c0a8197e249e"
     },
@@ -1146,6 +1194,10 @@
       "sha256": "731d73c3ac417d4a6c7de24db590ec0ace6ba4172a7d89e0ccb25cd113597734"
     },
     {
+      "path": "scripts/install-scholarflow.ps1",
+      "sha256": "28a68164e27ea56e9f66941755690a78b62afaf58c9b30c7b801f52fa29930ef"
+    },
+    {
       "path": "scripts/knowledge_runtime.ps1",
       "sha256": "6cc3e91bf72ce8ec5c9cdce3cb5bddac9f4da95d4df83a9c7b22dadfa9284443"
     },
@@ -1155,11 +1207,11 @@
     },
     {
       "path": "scripts/library-delta.py",
-      "sha256": "48cf6206b696af7ef5ff69bd90b5cf3790a63c088e76c9619b4eec0b1aa030ab"
+      "sha256": "3d726c9b164e2cb32627c76eda6421282707999a2d59bc3079ac1503b5cce8ec"
     },
     {
       "path": "scripts/library_knowledge.py",
-      "sha256": "a25ae7e02a5d369aaa1e9ab1a36f6090725cec460f58e8de9b739f007dc5aa54"
+      "sha256": "d6dd8b8424c635d3db972d5816783527fe23685efb6b406c7f2aeb64ad27433d"
     },
     {
       "path": "scripts/node_runtime.ps1",
@@ -1175,7 +1227,7 @@
     },
     {
       "path": "scripts/python_runtime.ps1",
-      "sha256": "85156429d9ec33598011c6dd8548f5aab653019431e1e02828f7281a77a84b83"
+      "sha256": "d267784a17e91ea3f0820ab87471d08c125aa21751a5d77183fe7e6a85ece379"
     },
     {
       "path": "scripts/render_library_answer.py",
@@ -1183,7 +1235,7 @@
     },
     {
       "path": "scripts/research-desk-runtime.ps1",
-      "sha256": "1044965cfea17e0a3456fd28f24e79e1960628e351f4c0f793cad6a553e618a3"
+      "sha256": "56b9bd309e630b0eab1589621601ecdddba2a1f47a4fb15d4417b02aae580996"
     },
     {
       "path": "scripts/research-library.ps1",
@@ -1195,7 +1247,7 @@
     },
     {
       "path": "scripts/research_library.py",
-      "sha256": "0d2a95560668302c67d138ba4e4a7d83bd9abde7f168cc2c67a0319b89056433"
+      "sha256": "15d993a44eebe63a268290ec9e448a8a4ecd305eaab1d6515b4e3516b3562335"
     },
     {
       "path": "scripts/run_library_support.py",
@@ -1206,12 +1258,24 @@
       "sha256": "31fbde69a3f7609f2c2a0c8ee76ecc22f72003372843b00778998ac31b9c9247"
     },
     {
+      "path": "scripts/scholarflow-agent.ps1",
+      "sha256": "e67c099bd52c93eda46dd58f0f4b48e846afdfb075c52e12553d6fc02c35c666"
+    },
+    {
+      "path": "scripts/scholarflow-agent.py",
+      "sha256": "fe66f1d1a444af599a196ad98511d95c379371be3b22519ad2a3b3d59e45c7e2"
+    },
+    {
       "path": "scripts/scholarflow-local.ps1",
       "sha256": "f82b516bf4d429ab5a6308cf5f4f04c99569dccae19201b2e93143888a29d0c2"
     },
     {
       "path": "scripts/scholarflow-minimal.ps1",
       "sha256": "0f39fafe0631f645ce1c8ae67b70ffec258e39d1b6fc4bd51dad497b58a074c5"
+    },
+    {
+      "path": "scripts/windows-process-parent.ps1",
+      "sha256": "3dce2b3ad48134db28c29c221965e464fb933b92814c445fbf9fc92176d0df68"
     },
     {
       "path": "scripts/workbench_browser_checks.js",
@@ -1234,8 +1298,32 @@
       "sha256": "b663bd3ddf1442c9c1332092e3e1b2c77487361e6f96638cc1a9f65a3090d47d"
     },
     {
+      "path": "tests/test_build_portable_agent.py",
+      "sha256": "15dff04d3dad95e5c7dd56320cc0dc924f12ddde261a795cd4d6b3f881f0d638"
+    },
+    {
+      "path": "tests/test_configured_library_integration.py",
+      "sha256": "7e92db8efa4337c0cf0f5969f667156deb142e86b39e78bd8ff2ed065a326a2f"
+    },
+    {
       "path": "tests/test_embedding_budget_proxy.py",
       "sha256": "d46e346a6ebf8afd853502b1367ecd6229062281c99f75c16dd55fea35a0f704"
+    },
+    {
+      "path": "tests/test_library_unicode_state.py",
+      "sha256": "ef21500f1e744027499988f54779f561367004d6b8bab4e9374f2c3edbb87089"
+    },
+    {
+      "path": "tests/test_nature_skill_package.py",
+      "sha256": "fcc5d828377898af88f3d2b9f420c175677a92e8aba46c094461879f549ebfac"
+    },
+    {
+      "path": "tests/test_portable_auth.py",
+      "sha256": "088008cfe985625e55561846e178db349b68ca378d13cd341e43ea6bfa08426a"
+    },
+    {
+      "path": "tests/test_portable_knowledge.py",
+      "sha256": "43bc39eceb593d3532b7e5aa0b217fcb10ea8215d65d9e815075536be10b05e5"
     },
     {
       "path": "tests/test_research_continuity.py",
@@ -1258,8 +1346,20 @@
       "sha256": "6d771f3b6dbf378b6b00af1c59964cd02387f8efa261c8e98e8e5d69f87c0ef4"
     },
     {
+      "path": "tests/test_scholarflow_agent_cli.py",
+      "sha256": "a74118cfbf69863ac2116d70e00cb230c86df19e2061ab00b442ca2aad7c5135"
+    },
+    {
+      "path": "tests/test_source_inventory.py",
+      "sha256": "c64fe01b73ea4108fa56bc280be8ccf78dcaf078259ffd025563861f1418a483"
+    },
+    {
       "path": "tests/test_web_research_loop.py",
       "sha256": "89021ed749942ce0d7f62c318aad4990910f4e0573effd7d54a026b2044b5bf1"
+    },
+    {
+      "path": "tests/test_windows_process_parent.py",
+      "sha256": "b3145cc87af727880ab2bf09376823e8ccd195fc9b0b279e639dd4723f4a1523"
     },
     {
       "path": "tests/test_workspace_knowledge.py",

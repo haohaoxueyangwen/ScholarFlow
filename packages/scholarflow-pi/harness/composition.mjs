@@ -11,6 +11,7 @@ import { validatePdfNoteGrant } from "../capabilities/pdf-note/grant.mjs";
 import { validateLibraryGrant } from "../capabilities/library-read/grant.mjs";
 import { validateContinuityGrant } from "../capabilities/research-continuity/grant.mjs";
 import { validateWorkflow } from "../capabilities/research-workflow/grant.mjs";
+import { natureSkillBundle } from "./nature-skill.mjs";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Composition only: adding a capability does not add a domain command switch.
@@ -69,7 +70,8 @@ export function resolveComposition({ ids, libraryRead, entries = catalog } = {})
       enabled.push({ id, ...item, modulePath, skillPaths });
     } catch (error) { diagnostics.push({ id, status: "disabled", reason: error.message }); }
   }
-  return { enabled, diagnostics, skillPaths: enabled.flatMap((item) => item.skillPaths) };
+  const nature = natureSkillBundle({root: resolve(packageRoot, "../..")});
+  return { enabled, diagnostics, skillPaths: [...enabled.flatMap((item) => item.skillPaths), ...nature.skillPaths], natureResources: nature.resources };
 }
 
 export function runtimeArgs(composition, {includeLocalQwenProvider = true} = {}) {

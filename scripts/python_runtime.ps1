@@ -35,7 +35,7 @@ function Save-ScholarFlowPythonRuntime {
         [System.Collections.IDictionary] $Runtime
     )
 
-    $runtimeRoot = Join-Path $RepoRoot ".tmp\workbench-runtime"
+    $runtimeRoot = if ($env:SCHOLARFLOW_RUNTIME_DIR) { Join-Path $env:SCHOLARFLOW_RUNTIME_DIR 'workbench-runtime' } else { Join-Path $RepoRoot ".tmp\workbench-runtime" }
     $target = Join-Path $runtimeRoot "python-runtime.json"
     New-Item -ItemType Directory -Path $runtimeRoot -Force | Out-Null
     $payload = [ordered]@{
@@ -70,7 +70,7 @@ function Resolve-ScholarFlowPython {
         return $explicit
     }
 
-    $cachePath = Join-Path $RepoRoot ".tmp\workbench-runtime\python-runtime.json"
+    $cachePath = if ($env:SCHOLARFLOW_RUNTIME_DIR) { Join-Path $env:SCHOLARFLOW_RUNTIME_DIR 'workbench-runtime\python-runtime.json' } else { Join-Path $RepoRoot ".tmp\workbench-runtime\python-runtime.json" }
     if (Test-Path -LiteralPath $cachePath -PathType Leaf) {
         try {
             $cache = Get-Content -LiteralPath $cachePath -Raw -Encoding UTF8 | ConvertFrom-Json

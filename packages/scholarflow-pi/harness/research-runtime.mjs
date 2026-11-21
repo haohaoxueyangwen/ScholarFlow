@@ -3,10 +3,10 @@ import {readFileSync,writeFileSync,mkdirSync,existsSync,realpathSync,statSync} f
 import {isDeepStrictEqual} from 'node:util';
 import {resolve,dirname,basename,delimiter} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {homedir} from 'node:os';
 import {spawnSync} from 'node:child_process';
 import {resolveComposition,runtimeArgs} from './composition.mjs';
 import {resolveScholarPython} from './python-runtime.mjs';
+import {deepseekApiKey} from './provider-auth.mjs';
 export const pkg=resolve(dirname(fileURLToPath(import.meta.url)),'..'),root=resolve(pkg,'../..');
 export function buildResearchRuntime(workspacePath,{credentials=true}={}){
  const python=resolveScholarPython();
@@ -27,7 +27,7 @@ export function buildResearchRuntime(workspacePath,{credentials=true}={}){
  }
  const libraryHome=basename(m.data_dir)==='facts'?dirname(m.data_dir):resolve(m.data_dir,'_research_knowledge');
  const env={...process.env,...values,SCHOLARFLOW_LIBRARY_HOME:libraryHome,SCHOLARFLOW_LIBRARY_FACTS_DIR:m.data_dir,PI_CODING_AGENT_DIR:agent,PATH:dirname(process.execPath)+delimiter+process.env.PATH};
- if(m.provider==='deepseek'&&credentials){const auth=JSON.parse(readFileSync(resolve(homedir(),'.pi/agent/auth.json'),'utf8'));const key=auth?.deepseek?.key;if(typeof key!=='string'||!key.trim())throw new Error('Existing DeepSeek API authentication required');env.DEEPSEEK_API_KEY=key;}
+ if(m.provider==='deepseek'&&credentials)env.DEEPSEEK_API_KEY=deepseekApiKey();
  const model=m.provider==='deepseek'?'deepseek-v4-flash':'qwen38-vision';
  return {manifest:m,composition,agent,cwd,sessions,env,cliPath:resolve(pkg,'node_modules/@earendil-works/pi-coding-agent/dist/cli.js'),args:[...runtimeArgs(composition,{includeLocalQwenProvider:m.provider==='scholarflow-local'}),'--provider',m.provider,'--model',model,'--thinking','off'],model};
 }

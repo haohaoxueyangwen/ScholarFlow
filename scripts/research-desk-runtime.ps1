@@ -22,7 +22,8 @@ $WorkspaceHome = [IO.Path]::GetFullPath($WorkspaceHome).TrimEnd('\')
 if ($DataDir -match '["\r\n]' -or $WorkspaceHome -match '["\r\n]') { throw "Invalid data path." }
 $apiUrl = "http://127.0.0.1:$ApiPort"
 $webUrl = "http://127.0.0.1:$WebPort"
-$registry = Join-Path $root ".tmp\research-desk-instances"
+$runtimeBase = if ($env:SCHOLARFLOW_RUNTIME_DIR) { [IO.Path]::GetFullPath($env:SCHOLARFLOW_RUNTIME_DIR) } else { Join-Path $root '.tmp' }
+$registry = Join-Path $runtimeBase 'research-desk-instances'
 $recordPath = Join-Path $registry "$ApiPort-$WebPort.json"
 
 function Test-Port([int] $Port) {
@@ -42,10 +43,10 @@ function Test-RecordedProcess([int] $Id, [string] $Path, [long] $StartTicks) {
   } catch { return $false }
 }
 
-function Test-PortOwner([int] $Port, [int] $ExpectedId) {
+function Get-PortOwner([int] $Port) {
   # netstat is read-only and remains usable where Get-NetTCPConnection requires elevation.
   $lines = & netstat.exe -ano -p tcp 2>$null
-  if ($LASTEXITCODE -ne 0) { return $false }
+  if ($LASTEXITCODE -ne 0) { return 0 }
   $owners = @()
   foreach ($line in $lines) {
     if ($line -match '^\s*TCP\s+(?<local>\S+)\s+\S+\s+LISTENING\s+(?<owner>\d+)\s*$') {
@@ -53,7 +54,22 @@ function Test-PortOwner([int] $Port, [int] $ExpectedId) {
     }
   }
   $owners = @($owners | Select-Object -Unique)
-  return ($owners.Count -eq 1 -and $owners[0] -eq $ExpectedId)
+  if ($owners.Count -ne 1) { return 0 }
+  return [int]$owners[0]
+}
+
+function Test-PortOwner([int] $Port, [int] $ExpectedId) { return (Get-PortOwner $Port) -eq $ExpectedId }
+
+function Test-ApiListener([object] $Record) {
+  $listenerId = if ($Record.api_listener_pid) { [int]$Record.api_listener_pid } else { [int]$Record.api_pid }
+  $listenerPath = if ($Record.api_listener_exe) { $Record.api_listener_exe } else { $Record.api_exe }
+  $listenerTicks = if ($Record.api_listener_start_ticks) { [long]$Record.api_listener_start_ticks } else { [long]$Record.api_start_ticks }
+  if (-not (Test-RecordedProcess $listenerId $listenerPath $listenerTicks) -or -not (Test-PortOwner $ApiPort $listenerId)) { return $false }
+  if ($listenerId -ne [int]$Record.api_pid) {
+    . (Join-Path $PSScriptRoot 'windows-process-parent.ps1')
+    if ((Get-ScholarFlowParentProcessId -ProcessId $listenerId) -ne [int]$Record.api_pid) { return $false }
+  }
+  return $true
 }
 
 function Test-WebAssets {
@@ -83,7 +99,7 @@ function Get-InstanceState {
         [int]$record.api_port -ne $ApiPort -or [int]$record.web_port -ne $WebPort -or
         -not (Test-RecordedProcess $record.api_pid $record.api_exe $record.api_start_ticks) -or
         -not (Test-RecordedProcess $record.web_pid $record.web_exe $record.web_start_ticks) -or
-        -not (Test-PortOwner $ApiPort $record.api_pid) -or -not (Test-PortOwner $WebPort $record.web_pid)) {
+        -not (Test-ApiListener $record) -or -not (Test-PortOwner $WebPort $record.web_pid)) {
       return @{ status = "conflict"; reason = "The recorded process or its data scope cannot be verified. No process was stopped." }
     }
     $api = Invoke-RestMethod -Uri "$apiUrl/health" -TimeoutSec 3
@@ -108,7 +124,10 @@ if ($StopOwned) {
   $state = Get-InstanceState
   if ($state.status -ne "ready") { throw "The instance changed before it could be stopped." }
   Stop-Process -Id ([int]$state.record.web_pid) -ErrorAction Stop
-  Stop-Process -Id ([int]$state.record.api_pid) -ErrorAction Stop
+  if ($state.record.api_listener_pid -and [int]$state.record.api_listener_pid -ne [int]$state.record.api_pid) {
+    if (Test-RecordedProcess ([int]$state.record.api_listener_pid) $state.record.api_listener_exe ([long]$state.record.api_listener_start_ticks)) { Stop-Process -Id ([int]$state.record.api_listener_pid) -ErrorAction Stop }
+  }
+  if (Test-RecordedProcess ([int]$state.record.api_pid) $state.record.api_exe ([long]$state.record.api_start_ticks)) { Stop-Process -Id ([int]$state.record.api_pid) -ErrorAction Stop }
   Write-Host "Stopped only the verified ScholarFlow research desk pair."
   exit 0
 }
@@ -131,7 +150,7 @@ if ($state.status -eq "ready") {
 if (-not (Test-Path -LiteralPath $DataDir -PathType Container)) { throw "Research data directory does not exist: $DataDir" }
 if (-not (Test-Path -LiteralPath (Join-Path $webRoot "node_modules\vinext\dist\cli.js") -PathType Leaf)) { throw "Research web dependencies are missing. Install them before starting." }
 
-$buildParent = Join-Path $root ".tmp\research-desk-builds"
+$buildParent = Join-Path $runtimeBase 'research-desk-builds'
 $buildRoot = $null
 if (Test-Path -LiteralPath $buildParent -PathType Container) {
   foreach ($candidate in Get-ChildItem -LiteralPath $buildParent -Directory | Sort-Object LastWriteTimeUtc -Descending) {
@@ -184,6 +203,7 @@ if ($currentStamp -ne $sourceStamp) { throw "Web source changed while preparing 
 New-Item -ItemType Directory -Path $registry -Force | Out-Null
 $instance = [guid]::NewGuid().ToString('N')
 $apiProcess = $null
+$apiListener = $null
 $webProcess = $null
 try {
   $apiArguments = @('-s', '-B', '-m', 'scholarflow.research_http', '--port', "$ApiPort", '--data-dir', ('"' + $DataDir + '"'), '--home', ('"' + $WorkspaceHome + '"'), '--web-origin', $webUrl, '--web-origin', "http://localhost:$WebPort", '--instance-id', $instance)
@@ -202,14 +222,21 @@ try {
   }
   if (-not $ready) { throw "Research desk candidate did not become healthy; inspect logs in $registry." }
   $apiProcess.Refresh(); $webProcess.Refresh()
-  $record = [ordered]@{ root = $root; data_dir = $DataDir; workspace_home = $WorkspaceHome; api_port = $ApiPort; web_port = $WebPort; instance_id = $instance; build_id = $sourceStamp; build_root = $buildRoot; api_pid = $apiProcess.Id; api_exe = $apiProcess.Path; api_start_ticks = $apiProcess.StartTime.ToUniversalTime().Ticks; web_pid = $webProcess.Id; web_exe = $webProcess.Path; web_start_ticks = $webProcess.StartTime.ToUniversalTime().Ticks }
+  $listenerId = Get-PortOwner $ApiPort
+  if (-not $listenerId) { throw 'Cannot identify the API listener; refusing to claim ownership.' }
+  if ($listenerId -ne $apiProcess.Id) {
+    . (Join-Path $PSScriptRoot 'windows-process-parent.ps1')
+    if ((Get-ScholarFlowParentProcessId -ProcessId $listenerId) -ne $apiProcess.Id) { throw 'API listener is not the launched Python process or its direct child.' }
+  }
+  $apiListener = Get-Process -Id $listenerId -ErrorAction Stop
+  $record = [ordered]@{ root = $root; data_dir = $DataDir; workspace_home = $WorkspaceHome; api_port = $ApiPort; web_port = $WebPort; instance_id = $instance; build_id = $sourceStamp; build_root = $buildRoot; api_pid = $apiProcess.Id; api_exe = $apiProcess.Path; api_start_ticks = $apiProcess.StartTime.ToUniversalTime().Ticks; api_listener_pid = $apiListener.Id; api_listener_exe = $apiListener.Path; api_listener_start_ticks = $apiListener.StartTime.ToUniversalTime().Ticks; web_pid = $webProcess.Id; web_exe = $webProcess.Path; web_start_ticks = $webProcess.StartTime.ToUniversalTime().Ticks }
   [IO.File]::WriteAllText($recordPath, ($record | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
   $verified = Get-InstanceState
   if ($verified.status -ne 'ready') { throw "Started candidate could not be verified: $($verified.reason)" }
   Write-Host "Research desk ready: $webUrl/desk"
   if (-not $NoBrowser) { Start-Process "$webUrl/desk" }
 } catch {
-  foreach ($process in @($webProcess, $apiProcess)) {
+  foreach ($process in @($webProcess, $apiListener, $apiProcess)) {
     if ($process) { try { $process.Refresh(); if (-not $process.HasExited) { $process.Kill() } } catch { } }
   }
   throw

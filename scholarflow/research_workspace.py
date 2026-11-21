@@ -1,7 +1,7 @@
 """Host-selected scope and operator controls; Pi remains the only model runtime."""
 from pathlib import Path
 from uuid import uuid4
-import hashlib,json,re
+import hashlib,json,re,os
 from .storage import ScholarFlowStore
 from .reader_workspace import ReaderWorkspaceStore,MAX_READER_PDF_BYTES
 from .pdf_reading import PdfReadGrant,PdfSourceService
@@ -11,8 +11,8 @@ from .proposal_state import load_proposal_state
 from .mutations import record_fingerprint
 
 ROOT=Path(__file__).resolve().parents[1]
-HOME=ROOT/'.local/research-workspaces'
-DEFAULT_DATA=ROOT/'.local/research-library/facts'
+HOME=Path(os.environ.get('SCHOLARFLOW_WORKSPACE_HOME',str(ROOT/'.local/research-workspaces'))).absolute()
+DEFAULT_DATA=Path(os.environ.get('SCHOLARFLOW_LIBRARY_HOME',str(ROOT/'.local/research-library'))).absolute()/'facts'
 
 def sha(raw):return 'sha256:'+hashlib.sha256(raw).hexdigest()
 def safe(path,*,file=False,exists=True):

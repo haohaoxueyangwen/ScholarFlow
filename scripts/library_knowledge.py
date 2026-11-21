@@ -18,10 +18,16 @@ def facts_root():
 
 def embedding_endpoint():
     config=HOME/'embedding-runtime.json'
+    if os.environ.get('SCHOLARFLOW_PORTABLE_KNOWLEDGE')=='1' and not config.exists():raise ValueError('Configure the portable embedding endpoint explicitly; no server is started automatically')
     value=json.loads(config.read_text(encoding='utf-8')) if config.exists() else {}
     endpoint=value.get('endpoint','http://127.0.0.1:8081/v1/embeddings')
-    if endpoint not in {'http://127.0.0.1:8081/v1/embeddings','http://127.0.0.1:8082/v1/embeddings'}:raise ValueError('Only reviewed loopback embedding endpoints are allowed')
-    if endpoint.endswith(':8082/v1/embeddings') and (value.get('model_sha256')!=EMBEDDING_MODEL_SHA256 or value.get('parity_status')!='verified'):raise ValueError('GPU embedding qualification missing')
+    portable=os.environ.get('SCHOLARFLOW_PORTABLE_KNOWLEDGE')=='1'
+    if portable:
+        from scholarflow.portable_knowledge import configured_backend
+        if not configured_backend(value):raise ValueError('Portable loopback embedding configuration is invalid or GPU qualification is missing')
+    else:
+        if endpoint not in {'http://127.0.0.1:8081/v1/embeddings','http://127.0.0.1:8082/v1/embeddings'}:raise ValueError('Only reviewed loopback embedding endpoints are allowed')
+        if endpoint.endswith(':8082/v1/embeddings') and (value.get('model_sha256')!=EMBEDDING_MODEL_SHA256 or value.get('parity_status')!='verified'):raise ValueError('GPU embedding qualification missing')
     return endpoint
 
 
@@ -79,6 +85,12 @@ def records():
     for name in ('inventory.json','managed-sources.json'):
         path=HOME/name
         if path.exists():result.extend(json.loads(path.read_text(encoding='utf-8'))['records'])
+    configured=HOME/'configured-inventory.json'
+    if configured.exists():
+        from scholarflow.source_inventory import INVENTORY_SCHEMA,SourceInventory
+        manifest=json.loads(configured.read_text(encoding='utf-8'))
+        if manifest.get('schema_version')!=INVENTORY_SCHEMA or manifest.get('source_mode')!='configured' or not isinstance(manifest.get('records'),list):raise ValueError('Invalid configured source inventory')
+        result.extend(SourceInventory(HOME).authorized_records(manifest['records']))
     if len({r['source_id'] for r in result})!=len(result):raise ValueError('Duplicate library source identity')
     return result
 def scope_root(scope):return HOME/'indexes'/scope if scope.startswith('stage-library-') else HOME/'project-indexes'/hashlib.sha256(scope.encode()).hexdigest()[:32]
@@ -100,7 +112,7 @@ def scoped_records(scope):
     from scholarflow.knowledge_engine import KnowledgeSourceMap
     mappings=KnowledgeSourceMap(facts_root()).list_sources(project_stage_id=scope)
     allowed={s.metadata.get('library_source_id'):s for s in mappings if s.source_type=='library_source'}
-    return [r for r in catalog if r['source_id'] in allowed and allowed[r['source_id']].content_hash==r['sha256']]
+    return [r for r in catalog if r['source_id'] in allowed and allowed[r['source_id']].content_hash==r['sha256'] and (r.get('inventory_mode')!='configured' or r.get('project_stage_ids')==[scope])]
 
 
 def binding_hash(scope):
@@ -121,6 +133,14 @@ def sync_source_metadata(record):
     manifest=KnowledgeIngestionManifest(facts_root());manifest.set('library:'+record['source_id'],{'source_ref':'library:'+record['source_id'],'source_type':'library_source','title':title,'scope':'library:'+record['group'],'source_version':INDEX_SCHEMA,'content_hash':record['sha256'],'status':'indexed','document_id':record['source_id'],'metadata':metadata})
 def current(record):
     path=Path(record['path'])
+    if record.get('inventory_mode')=='configured':
+        from scholarflow.source_inventory import InventoryError,SourceInventory,_read_source
+        try:
+            registry=SourceInventory(HOME)
+            if not registry.authorized_records([record]):return False
+            root=Path(next(item['path'] for item in registry._config()['roots'] if item['id']==record['group']))
+            return sha(_read_source(path,root,80_000_000 if record['kind']=='pdf' else 2_000_000))==record['sha256']
+        except (OSError,InventoryError,StopIteration):return False
     if not path.is_file() or path.is_symlink() or getattr(path,'is_junction',lambda:False)() or path.stat().st_nlink!=1 or path.stat().st_size>(80_000_000 if record['kind']=='pdf' else 2_000_000):return False
     if sha(path.read_bytes())!=record['sha256']:return False
     if record.get('origin_artifact'):
@@ -182,7 +202,7 @@ async def _ingest(source_ids,max_chunks,scope_id,expected_versions,progress):
     result=[];consumed=0;rags={}
     try:
       for record in selected:
-        target=scope_id or record['stage_id'];path=state_path(target);state=json.loads(path.read_text()) if path.exists() else {'entries':{}}
+        target=scope_id or record['stage_id'];path=state_path(target);state=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'entries':{}}
         old=state['entries'].get(record['source_id'])
         if target not in rags:rags[target]=await rag_for(target)
         rag=rags[target]
@@ -224,7 +244,8 @@ async def query(stage,question,limit=5):
     path=state_path(stage)
     if not path.exists():return {'items':[],'status':'not_indexed','text_generation_calls':0}
     if not stage.startswith('stage-library-') and not scoped_records(stage):return {'items':[],'status':'no_current_evidence','text_generation_calls':0}
-    authority=binding_hash(stage);state=json.loads(path.read_text());rag=await rag_for(stage)
+    registry=HOME/'source-roots.json';registry_hash=sha(registry.read_bytes()) if registry.exists() else None
+    authority=binding_hash(stage);state=json.loads(path.read_text(encoding='utf-8'));rag=await rag_for(stage)
     try:
         result=await rag.aquery_data(question,QueryParam(mode='naive',top_k=50,chunk_top_k=50,max_total_tokens=8000,enable_rerank=False))
         chunks=result.get('data',{}).get('chunks',[]);items=[];active={r['source_id']:r for r in scoped_records(stage)};originals={}
@@ -241,7 +262,7 @@ async def query(stage,question,limit=5):
                 items.append({'source_id':source_id,'stage_id':stage,'source_sha256':record['sha256'],'title':record.get('title') or Path(record['path']).name,'evidence_level':record['evidence_level'],'origin_evidence':record.get('origin_evidence'),'origin_artifact':record.get('origin_artifact'),'anchor':anchor['anchor'],'text':original['text'],'reference_id':ref,'text_representation':'exact current source; index normalization not quoted',**evidence_metadata(record,anchor['anchor'],ref)})
                 break
             if len(items)>=limit:break
-        if binding_hash(stage)!=authority:raise ValueError('Project source authority changed during retrieval')
+        if binding_hash(stage)!=authority or (sha(registry.read_bytes()) if registry.exists() else None)!=registry_hash:raise ValueError('Project source authority changed during retrieval')
         return {'status':'ok' if items else 'no_current_evidence','items':items,'backend':'LightRAG 1.5.4 semantic vector retrieval','text_generation_calls':0}
     finally:await rag.finalize_storages()
 

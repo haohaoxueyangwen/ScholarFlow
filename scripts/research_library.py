@@ -31,18 +31,21 @@ def sensitive(text):
     # Quarantine plausible credentials, never print them or silently index redactions.
     return bool(re.search(r'\bsk-[A-Za-z0-9_-]{20,}|(?i:Bearer)\s+[A-Za-z0-9_.-]{24,}|(?i:api[_-]?key|password|client_secret)\s*[:=]\s*[\"\']?[A-Za-z0-9_-]{20,}',text))
 def inventory():
-    raise ValueError('Source inventory is unavailable in this public preview')
+    from scholarflow.source_inventory import SourceInventory
+    return SourceInventory(HOME).scan()
 def stage(source_id):
     from scholarflow import ScholarFlowStore,ProjectStage
     from scholarflow.reader_workspace import ReaderWorkspaceStore
-    manifest=json.loads((HOME/'inventory.json').read_text(encoding='utf-8'));record=next(r for r in manifest['records'] if r['source_id']==source_id)
+    from scripts import library_knowledge as kb
+    record=next(r for r in kb.records() if r['source_id']==source_id)
+    if not kb.current(record):raise ValueError('Source changed or is no longer authorized')
     raw=Path(record['path']).read_bytes()
     if sha(raw)!=record['sha256']:raise ValueError('Source changed since inventory')
     data=HOME/'facts';store=ScholarFlowStore(data)
     if store.get_project_stage(record['stage_id']) is None:store.create_project_stage(ProjectStage(stage_id=record['stage_id'],project_name=record['group'],title='Research library',goal='Source-linked reading and two-layer knowledge'))
     if record['kind']!='pdf':return {'record':record,'text':raw.decode('utf-8-sig')}
     os.environ['SCHOLARFLOW_PDF_PARSER']='pymupdf-blocks';os.environ['SCHOLARFLOW_GROBID_BASE_URL']='';os.environ['SCHOLARFLOW_TESSERACT_EXE']=''
-    imported=ReaderWorkspaceStore(data).import_pdf(Path(record['path']).name,raw,project_stage_ids=[record['stage_id']])
+    imported=ReaderWorkspaceStore(data).import_pdf(Path(record['path']).name,raw,project_stage_ids=record.get('project_stage_ids',[record['stage_id']]))
     if imported['status']!='parsed':raise ValueError('No parsed text: '+imported.get('parse_error','unavailable'))
     directory=data/'_reader/imports'/imported['import_id'];structure=json.loads((directory/'structured.json').read_text(encoding='utf-8'))
     return {'record':record,'imported':imported,'structure':structure,'structure_hash':sha((directory/'structured.json').read_bytes())}
@@ -50,6 +53,6 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('action',choices=['inventory','stage']);parser.add_argument('--source-id');args=parser.parse_args()
     if args.action=='inventory':
         from collections import Counter
-        result=inventory();print(json.dumps({'sources':len(result['records']),'groups':dict(Counter(r['group'] for r in result['records'])),'reading':dict(Counter(r['reading_state'] for r in result['records'])),'excluded':len(result['excluded'])},ensure_ascii=False))
+        result=inventory();print(json.dumps({'sources':len(result['records']),'groups':dict(Counter(r['group'] for r in result['records'])),'reading':dict(Counter(r['reading_state'] for r in result['records'])),'excluded':result.get('counts',{}).get('excluded',len(result.get('excluded',[])))},ensure_ascii=False))
     else:print(json.dumps(stage(args.source_id),ensure_ascii=False))
 if __name__=='__main__':main()
