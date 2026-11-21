@@ -181,7 +181,7 @@ class WebResearchService:
                 stage=m['stage_id'];artifact=m['pdf']['artifact_id'] if m['pdf'] else ''
                 prefix=f'当前受控项目 stage_id={stage}，PDF document_id=selected-pdf，笔记 artifact_id={artifact}。请先读取 research-workflow Skill；仅使用当前授权。\n'
                 if turn['mode']=='note':
-                    prefix+='请读取 pdf-note Skill，先调用 sf_pdf_note_context(mode=create)，只依据其全部授权片段及精确 source_versions 生成一份待审阅的笔记提案；不得批准、写文件或声称已保存。最后简短说明待审阅并给出完整提案ID/hash；正文由网页审阅卡展示，无需重复。\n'
+                    prefix+='请读取 pdf-note Skill，先调用 sf_pdf_note_context(mode=create)，只依据其全部授权片段及精确 source_versions 生成一份待审阅的笔记提案；不得批准、写文件或声称已保存。不要增强原文结论，不确定之处明确标注；待审阅、未保存等会变化的操作状态只放在对话说明，不能写进笔记正文。最后简短说明待审阅并给出完整提案ID/hash；正文由网页审阅卡展示，无需重复。\n'
                 elif turn['mode']=='knowledge':
                     prefix+='请读取 library-read Skill，并先使用 sf_library_search 检索当前项目；只依据返回的当前证据回答并逐条标注真实 reference_id，缺证据明确说明。\n'
                 env={**os.environ,'PYTHONUTF8':'1','PYTHONNOUSERSITE':'1','SCHOLARFLOW_PYTHON':sys.executable}
@@ -218,6 +218,16 @@ class WebResearchService:
                 self._mark_index_failed(result.get('knowledge',{}),error)
                 result['knowledge']={'status':'failed','error_code':str(error)[:300],'note_saved':True}
         return {'phase':result.get('phase'),'knowledge':result.get('knowledge',{})}
+
+    def revise(self,workspace_id,payload):
+        stage=payload.get('stage_id');path,_=self._path(workspace_id,stage)
+        with self._lock:
+            if any(value[0]==workspace_id for value in self._active):raise DomainQueryError('session_busy','请先等待 Pi 完成当前消息')
+        try:
+            result=rw.revise(path,payload.get('proposal_id'),payload.get('reviewed_hash'),
+                title=payload.get('title'),content=payload.get('content'),request_id=payload.get('request_id'))
+        except (ValueError,OSError,KeyError,TypeError) as error:raise DomainQueryError('invalid_state',str(error)) from error
+        return result
 
     def _set_job_status(self, job, status, error=''):
         try:
@@ -258,9 +268,8 @@ class WebResearchService:
     def _run_index(self,path,workspace_id,job):
         try:
             home=wk.home_for(rw.load(path));home.mkdir(parents=True,exist_ok=True)
-            config=rw.DEFAULT_DATA.parent/'embedding-runtime.json'
-            if home!=rw.DEFAULT_DATA.parent and config.exists() and not (home/'embedding-runtime.json').exists():
-                atomic_write_json(home/'embedding-runtime.json',json.loads(config.read_text(encoding='utf-8')))
+            # A library's embedding endpoint and credentials are its own scope.
+            # Never copy configuration implicitly from a different library.
             start = self._index_commands(path)
         except Exception as error:
             self._mark_index_failed(job, error)

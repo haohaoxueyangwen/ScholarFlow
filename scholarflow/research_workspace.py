@@ -6,9 +6,10 @@ from .storage import ScholarFlowStore
 from .reader_workspace import ReaderWorkspaceStore,MAX_READER_PDF_BYTES
 from .pdf_reading import PdfReadGrant,PdfSourceService
 from .pdf_notes import capability_module,read_pdf_note_sources
-from .persistence import atomic_write_json
+from .persistence import atomic_write_json, file_lock
 from .proposal_state import load_proposal_state
 from .mutations import record_fingerprint
+from .governed_writes import digest
 
 ROOT=Path(__file__).resolve().parents[1]
 HOME=Path(os.environ.get('SCHOLARFLOW_WORKSPACE_HOME',str(ROOT/'.local/research-workspaces'))).absolute()
@@ -119,8 +120,8 @@ def load(path,*,refresh=False):
         atomic_write_json(path.parent/'grants/workflow.json',expected);atomic_write_json(path,m)
     return m
 
-def call(facade,grant,prefix,action,scope,params,workspace):
-    request={'protocol_version':1,'request_id':'host-'+uuid4().hex,'task_id':workspace['workspace_id'],'operation':prefix+'.'+action,'scope':scope,'params':params,'idempotency_key':workspace['workspace_id']+'-'+prefix}
+def call(facade,grant,prefix,action,scope,params,workspace,*,idempotency_key=None):
+    request={'protocol_version':1,'request_id':'host-'+uuid4().hex,'task_id':workspace['workspace_id'],'operation':prefix+'.'+action,'scope':scope,'params':params,'idempotency_key':idempotency_key or workspace['workspace_id']+'-'+prefix}
     result=facade.execute(request,grant,operator=action=='decide')
     if not result['ok']:raise ValueError(json.dumps(result.get('error',result),ensure_ascii=False))
     return result['data']
@@ -139,14 +140,68 @@ def proposals(path):
     return result
 
 def decide(path,proposal_id,reviewed_hash,*,decision='approve'):
-    m,facade,grant,scope=note_facade(path)
-    result=call(facade,grant,'pdf.note','decide',scope,{'proposal_id':proposal_id,'decision':decision,'reviewed_hash':reviewed_hash},m)
+    path=safe(path,file=True)
+    with file_lock(path.parent/'note-review'):
+        m,facade,grant,scope=note_facade(path)
+        result=call(facade,grant,'pdf.note','decide',scope,{'proposal_id':proposal_id,'decision':decision,'reviewed_hash':reviewed_hash},m)
     if decision=='approve' and result['phase']=='committed':
         try:
             from .workspace_knowledge import enqueue
             result['knowledge']=enqueue(path)
         except Exception as error:result['knowledge']={'status':'failed','error_code':str(error)[:300],'note_saved':True}
     return result
+
+def revise(path,proposal_id,reviewed_hash,*,title,content,request_id):
+    """Replace a pending review with a new immutable, separately approved proposal.
+
+    A small journal makes retries safe if the process stops between creating the
+    replacement and rejecting the old proposal. No note or index is committed.
+    """
+    path=safe(path,file=True)
+    if not isinstance(request_id,str) or not re.fullmatch(r'revision-[a-f0-9]{32}',request_id):
+        raise ValueError('Explicit revision request ID required')
+    if not isinstance(title,str) or not title.strip() or len(title.strip())>1000 or not isinstance(content,str) or not content.strip() or len(content.strip())>12000:
+        raise ValueError('Title and note content are required and must fit the size limit')
+    title,content=title.strip(),content.strip()
+    payload_hash=digest({'proposal_id':proposal_id,'reviewed_hash':reviewed_hash,'title':title,'content':content})
+    with file_lock(path.parent/'note-review'):
+        m,facade,grant,scope=note_facade(path)
+        old=call(facade,grant,'pdf.note','status',scope,{'proposal_id':proposal_id},m)
+        if old['proposal_hash']!=reviewed_hash:raise ValueError('Reviewed proposal hash differs')
+        folder=path.parent/'revisions';folder.mkdir(exist_ok=True);safe(folder)
+        journal=folder/(request_id+'.json')
+        saved=json.loads(safe(journal,file=True).read_text(encoding='utf-8')) if journal.exists() else None
+        if saved and (saved.get('payload_hash')!=payload_hash or saved.get('proposal_id')!=proposal_id):
+            raise ValueError('Revision request ID already belongs to different content')
+        if old['phase']!='pending' and not (saved and old['phase']=='rejected'):
+            raise ValueError('Only a pending proposal can be revised')
+        proposal=old['proposal'];changes=proposal['normalized_changes'];snapshot=changes['source_snapshot']
+        current=read_pdf_note_sources(ScholarFlowStore(m['data_dir']),m['stage_id'],grant)
+        if current!=snapshot:raise ValueError('PDF sources changed; prepare a fresh workspace')
+        updated={key:changes[key] for key in ('title','content','status') if key in changes}
+        updated.update(title=title,content=content)
+        capability_module('note-write').validate_note_changes(updated)
+        if updated=={key:changes[key] for key in ('title','content','status') if key in changes}:
+            raise ValueError('Edit the title or content before creating a revision')
+        if not saved:
+            saved={'version':1,'proposal_id':proposal_id,'payload_hash':payload_hash}
+            atomic_write_json(journal,saved)
+        # The domain reserves a create target while its old proposal is pending.
+        # Record recovery intent before releasing that reservation. A retry with
+        # the same request and edited text completes the interrupted revision.
+        if old['phase']=='pending':
+            call(facade,grant,'pdf.note','decide',scope,{'proposal_id':proposal_id,'decision':'reject','reviewed_hash':reviewed_hash},m)
+        if saved.get('replacement_id'):
+            revised=call(facade,grant,'pdf.note','status',scope,{'proposal_id':saved['replacement_id']},m)
+            if revised['proposal_hash']!=saved.get('replacement_hash'):raise ValueError('Revision journal differs from proposal')
+        else:
+            params={'mode':proposal['mode'],'artifact_id':scope['artifact_id'],'changes':updated,
+                    'source_versions':{s['source_id']:s['fingerprint'] for s in snapshot['sources']},
+                    'expected_fingerprint':proposal['base_fingerprint']}
+            revised=call(facade,grant,'pdf.note','propose',scope,params,m,idempotency_key=m['workspace_id']+'-'+request_id)
+            saved.update(replacement_id=revised['proposal']['proposal_id'],replacement_hash=revised['proposal_hash'])
+            atomic_write_json(journal,saved)
+        return revised
 
 def export(path,*,reviewed_hash=None):
     path=safe(path,file=True);m=load(path)

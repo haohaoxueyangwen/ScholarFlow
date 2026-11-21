@@ -2199,6 +2199,10 @@ h3 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
 .reading-thread { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
 .reading-user { justify-self: end; background: #e7f3ee; border-radius: 10px; padding: 8px 10px; }
 .reading-note { border: 1px solid #b7dfd2; border-radius: 12px; padding: 12px; background: #f3fbf7; }
+.reading-review-editor, .reading-review-editor label { display: grid; gap: 6px; }
+.reading-review-editor { margin-top: 12px; padding: 12px; border: 1px solid #cde5dc; border-radius: 10px; background: white; }
+.reading-review-editor input, .reading-review-editor textarea { width: 100%; min-width: 0; box-sizing: border-box; font: inherit; border: 1px solid #d5e4de; border-radius: 8px; padding: 8px; }
+.reading-review-editor textarea { resize: vertical; min-height: 160px; }
 .reading-error { color: #8d3d32; }
 .reading-source, .reading-note button { margin-top: 6px; }
 .reading-resume { display: grid; gap: 6px; }

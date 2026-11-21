@@ -1,6 +1,7 @@
 """HTTP boundary tests using synthetic data and an ephemeral loopback server."""
 import http.client
 import json
+import socket
 import threading
 import unittest
 from urllib.parse import quote
@@ -13,6 +14,7 @@ class SyntheticService:
 
     def __init__(self):
         self.previews = 0
+        self.revisions = 0
 
     def projects(self):
         return {"items": [{"stage_id": "synthetic-project"}]}
@@ -20,6 +22,10 @@ class SyntheticService:
     def preview_project(self, value):
         self.previews += 1
         return {"received": value}
+
+    def revise(self, workspace, value):
+        self.revisions += 1
+        return {"workspace": workspace, "received": value}
 
     def read_pdf(self, import_id):
         if import_id != "synthetic-pdf":
@@ -136,6 +142,31 @@ class ResearchHTTPSecurityTests(unittest.TestCase):
         self.assertEqual(status, 204)
         self.assertEqual(headers.get("Access-Control-Allow-Origin"), self.origin)
         self.assertIn("X-ScholarFlow-Intent", headers.get("Access-Control-Allow-Headers", ""))
+
+    def test_revision_requires_the_same_trusted_session_and_intent(self):
+        cookie = self.session()
+        base = {"Origin": self.origin, "Cookie": cookie, "Content-Type": "application/json", "X-ScholarFlow-Intent": "confirm"}
+        for missing in ("Origin", "Cookie", "X-ScholarFlow-Intent"):
+            headers = dict(base); headers.pop(missing)
+            status, _, _ = self.request("POST", "/workspaces/example/revise", headers=headers, body=b'{}')
+            self.assertEqual(status, 403)
+        self.assertEqual(self.service.revisions, 0)
+        status, _, body = self.request("POST", "/workspaces/example/revise", headers=base, body=b'{}')
+        self.assertEqual(status, 200); self.assertEqual(json.loads(body)["workspace"], "example")
+        self.assertEqual(self.service.revisions, 1)
+
+    def test_repeated_rejected_posts_return_403_without_dispatch(self):
+        for _ in range(30):
+            status, _, body = self.request("POST", "/workspaces/example/revise", headers={"Content-Type":"application/json"}, body=b'{"synthetic":true}')
+            self.assertEqual(status, 403)
+            self.assertEqual(json.loads(body)["error"]["code"], "permission_denied")
+        self.assertEqual(self.service.revisions, 0)
+
+    def test_rejected_incomplete_body_does_not_block_indefinitely(self):
+        with socket.create_connection(("127.0.0.1",self.server.server_port),timeout=2) as client:
+            client.sendall((f"POST /workspaces/example/revise HTTP/1.1\r\nHost: 127.0.0.1:{self.server.server_port}\r\nContent-Length: 100\r\nContent-Type: application/json\r\n\r\n".encode()+b"{"))
+            self.assertIn(b"403",client.recv(1024))
+        self.assertEqual(self.service.revisions,0)
 
     def test_chinese_pdf_filename_and_bytes_survive_http_response(self):
         cookie = self.session()

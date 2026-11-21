@@ -24,6 +24,9 @@ test("native Pi loads pinned Nature and only its unchanged verified resources", 
       additionalSkillPaths: composition.skillPaths});
     await loader.reload();
     assert.ok(loader.getSkills().skills.some((item) => item.name === "nature-writing"));
+    const naturePaths = composition.skillPaths.filter((path) => path.startsWith(temp));
+    if (process.env.SCHOLARFLOW_EXPECT_NATURE_SKILLS) assert.equal(naturePaths.length, Number(process.env.SCHOLARFLOW_EXPECT_NATURE_SKILLS));
+    for (const path of naturePaths) assert.ok(loader.getSkills().skills.some((skill) => skill.filePath === path), `Pi did not load ${path}`);
     assert.deepEqual(loader.getSkills().diagnostics.filter((item) => item.type === "error"), []);
     const loaded = await loadExtensions([resolve(profile, "extension.ts")], profile);
     assert.deepEqual(loaded.errors, []);
@@ -33,6 +36,7 @@ test("native Pi loads pinned Nature and only its unchanged verified resources", 
     const call = {toolName: "read", input: {path: resource.path}};
     assert.equal(await guard(call, {cwd: profile}), undefined);
     assert.equal((await guard({toolName: "read", input: {path: resolve(root, ".pi/settings.json")}}, {cwd: profile})).block, true);
+    assert.equal((await guard({toolName: "bash", input: {command: "echo unsafe"}}, {cwd: profile})).block, true);
     writeFileSync(resource.path, "tampered test resource");
     assert.equal((await guard(call, {cwd: profile})).block, true);
   } finally {

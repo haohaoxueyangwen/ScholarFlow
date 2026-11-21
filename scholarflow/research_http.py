@@ -114,8 +114,29 @@ class ResearchHandler(BaseHTTPRequestHandler):
 
     def _forbidden(self):
         # Do not parse a rejected request body as the next keep-alive request.
+        self._discard_unread_body()
         self.close_connection = True
         self._send(403, {"error": {"code": "permission_denied", "message": "需要可信的本机网页会话"}})
+
+    def _discard_unread_body(self):
+        # Windows may reset a response if a rejected POST closes with unread
+        # bytes. Bound both work and time; never parse an untrusted body.
+        if self.command != "POST" or self.headers.get("Transfer-Encoding"):
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+        except (TypeError, ValueError):
+            return
+        if length <= 0:
+            return
+        previous = self.connection.gettimeout()
+        try:
+            self.connection.settimeout(0.25)
+            self.rfile.read(min(length, 65537))
+        except OSError:
+            pass
+        finally:
+            self.connection.settimeout(previous)
 
     def _read_json(self):
         length = int(self.headers.get("Content-Length") or "0")
@@ -163,6 +184,9 @@ class ResearchHandler(BaseHTTPRequestHandler):
         if self.command == "POST" and path.startswith("/workspaces/") and path.endswith("/approve"):
             workspace_id = path.removeprefix("/workspaces/").removesuffix("/approve").strip("/")
             return 200, service.decide(workspace_id, self._read_json())
+        if self.command == "POST" and path.startswith("/workspaces/") and path.endswith("/revise"):
+            workspace_id = path.removeprefix("/workspaces/").removesuffix("/revise").strip("/")
+            return 200, service.revise(workspace_id, self._read_json())
         if self.command == "POST" and path.startswith("/workspaces/") and path.endswith("/index"):
             workspace_id = path.removeprefix("/workspaces/").removesuffix("/index").strip("/")
             return 202, service.index(workspace_id, self._read_json())
@@ -211,6 +235,7 @@ class ResearchHandler(BaseHTTPRequestHandler):
             content_type = (self.headers.get("Content-Type") or "").split(";", 1)[0].strip().lower()
             expected = "application/pdf" if path == "/workspaces/upload" else "application/json"
             if content_type != expected:
+                self._discard_unread_body()
                 self.close_connection = True
                 self._send(400, {"error": {"code": "invalid_argument", "message": "请求内容类型不正确"}})
                 return

@@ -52,6 +52,9 @@ def build_parser() -> argparse.ArgumentParser:
     prepare = w.add_parser("prepare"); prepare.add_argument("--project", required=True); prepare.add_argument("--provider", choices=["deepseek", "scholarflow-local"], required=True); prepare.add_argument("--pdf", type=Path); prepare.add_argument("--pages", default="1")
     proposals = w.add_parser("proposals"); proposals.add_argument("--workspace", type=Path, required=True)
     decide = w.add_parser("approve"); decide.add_argument("--workspace", type=Path, required=True); decide.add_argument("--proposal-id", required=True); decide.add_argument("--reviewed-hash", required=True)
+    revise = w.add_parser("revise", help="create a new review proposal from an edited UTF-8 note; does not approve")
+    revise.add_argument("--workspace", type=Path, required=True); revise.add_argument("--proposal-id", required=True); revise.add_argument("--reviewed-hash", required=True)
+    revise.add_argument("--title", required=True); revise.add_argument("--content-file", type=Path, required=True); revise.add_argument("--request-id", required=True, help="stable revision- followed by 32 lowercase hex characters; reuse to recover")
     sources = commands.add_parser("sources"); s = sources.add_subparsers(dest="action", required=True)
     s.add_parser("list")
     add = s.add_parser("add"); add.add_argument("--project", required=True); add.add_argument("--id", required=True); add.add_argument("--path", type=Path, required=True); add.add_argument("--kind", action="append", choices=["md", "pdf"], required=True); add.add_argument("--auto", action="store_true", help="refresh this root when starting Pi")
@@ -109,6 +112,10 @@ def run(args) -> object:
             return result
         if args.action == "prepare": return {"workspace": str(rw.prepare(facts, args.project, pdf=args.pdf, pages=args.pages, provider=args.provider)), "model_calls": 0}
         if args.action == "proposals": return rw.proposals(args.workspace)
+        if args.action == "revise":
+            source=rw.safe(args.content_file,file=True)
+            if source.stat().st_size > 48_000: raise ValueError("Revision content file exceeds the size limit")
+            return rw.revise(args.workspace,args.proposal_id,args.reviewed_hash,title=args.title,content=source.read_text(encoding="utf-8"),request_id=args.request_id)
         result = rw.decide(args.workspace, args.proposal_id, args.reviewed_hash)
         if result["phase"] == "committed":
             from scholarflow import workspace_knowledge as wk
@@ -139,7 +146,7 @@ def run(args) -> object:
         if local_auth.exists() and not os.environ.get("SCHOLARFLOW_PI_AUTH_FILE"):
             portable_auth.status(home)  # Validate before handing the location to Pi.
             os.environ["SCHOLARFLOW_PI_AUTH_FILE"] = str(local_auth)
-        if (home / "skills/nature-skills/active.json").exists():
+        if any((home / "skills/nature-skills" / name).exists() for name in ("active-v2.json", "active.json")):
             NatureSkillPackage(home).status()  # Fail closed before child process starts.
             os.environ["SCHOLARFLOW_NATURE_HOME"] = str(home)
         else:

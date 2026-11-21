@@ -46,6 +46,49 @@ class WorkspaceTests(unittest.TestCase):
         path=self.prepare();p=self.proposal(path);self.assertEqual(rw.proposals(path)[0]['phase'],'pending')
         with self.assertRaises(ValueError):rw.decide(path,p['proposal']['proposal_id'],'0'*64)
         self.assertFalse(self.store.list_research_artifacts())
+    def test_reviewed_edit_creates_new_proposal_then_explicit_approval(self):
+        path=self.prepare();old=self.proposal(path);pid=old['proposal']['proposal_id'];request='revision-'+'1'*32
+        args={'title':'Corrected note','content':'The original reports an increase, not monotonicity.','request_id':request}
+        new=rw.revise(path,pid,old['proposal_hash'],**args)
+        self.assertNotEqual(new['proposal']['proposal_id'],pid);self.assertNotEqual(new['proposal_hash'],old['proposal_hash'])
+        self.assertEqual(new['proposal']['normalized_changes']['source_snapshot'],old['proposal']['normalized_changes']['source_snapshot'])
+        self.assertEqual({p['phase'] for p in rw.proposals(path)},{'pending','rejected'})
+        self.assertFalse(self.store.list_research_artifacts())
+        self.assertEqual(rw.revise(path,pid,old['proposal_hash'],**args)['proposal']['proposal_id'],new['proposal']['proposal_id'])
+        with self.assertRaises(ValueError):rw.revise(path,pid,old['proposal_hash'],**{**args,'content':'Different'})
+        with self.assertRaises(ValueError):rw.decide(path,pid,old['proposal_hash'])
+        with self.assertRaises(ValueError):rw.decide(path,new['proposal']['proposal_id'],old['proposal_hash'])
+        saved=rw.decide(path,new['proposal']['proposal_id'],new['proposal_hash']);self.assertEqual(saved['phase'],'committed')
+        self.assertEqual(self.store.get_research_artifact(rw.load(path)['pdf']['artifact_id']).content,args['content'])
+    def test_revision_rejects_wrong_hash_cross_workspace_and_source_drift(self):
+        path=self.prepare();other=self.prepare('stage-a');old=self.proposal(path);pid=old['proposal']['proposal_id']
+        args={'title':'Corrected','content':'Corrected content','request_id':'revision-'+'2'*32}
+        with self.assertRaises(ValueError):rw.revise(path,pid,'wrong',**args)
+        with self.assertRaises(ValueError):rw.revise(other,pid,old['proposal_hash'],**args)
+        self.pdf.write_bytes(self.pdf.read_bytes()+b'changed')
+        with self.assertRaises(ValueError):rw.revise(path,pid,old['proposal_hash'],**args)
+        self.assertFalse(self.store.list_research_artifacts())
+    def test_revision_can_recover_after_rejection_before_new_proposal(self):
+        path=self.prepare();old=self.proposal(path);pid=old['proposal']['proposal_id']
+        args={'title':'Revised','content':'A narrower claim.','request_id':'revision-'+'3'*32}
+        actual=rw.call
+        def interrupted(facade,grant,prefix,action,scope,params,workspace,**kwargs):
+            if action=='propose':raise ValueError('simulated interruption')
+            return actual(facade,grant,prefix,action,scope,params,workspace,**kwargs)
+        with patch.object(rw,'call',side_effect=interrupted):
+            with self.assertRaisesRegex(ValueError,'interruption'):rw.revise(path,pid,old['proposal_hash'],**args)
+        revised=rw.revise(path,pid,old['proposal_hash'],**args)
+        self.assertEqual(revised['phase'],'pending');self.assertEqual(len(rw.proposals(path)),2)
+    def test_portable_cli_can_revise_without_web_or_model(self):
+        path=self.prepare();old=self.proposal(path);source=self.root/'edited.md'
+        source.write_text('A narrower, source-supported statement.',encoding='utf-8')
+        command=[sys.executable,str(rw.ROOT/'scripts/scholarflow-agent.py'),'--home',str(self.root/'cli-home'),
+            'workspaces','revise','--workspace',str(path),'--proposal-id',old['proposal']['proposal_id'],
+            '--reviewed-hash',old['proposal_hash'],'--title','Corrected','--content-file',str(source),'--request-id','revision-'+'4'*32]
+        result=subprocess.run(command,cwd=rw.ROOT,capture_output=True,text=True,encoding='utf-8',check=True)
+        revised=json.loads(result.stdout)
+        self.assertEqual(revised['phase'],'pending');self.assertEqual(revised['proposal']['normalized_changes']['content'],source.read_text(encoding='utf-8'))
+        self.assertFalse(self.store.list_research_artifacts())
     def test_save_export_and_fresh_process_equivalent_read(self):
         path=self.prepare();p=self.proposal(path);saved=rw.decide(path,p['proposal']['proposal_id'],p['proposal_hash']);self.assertEqual(saved['phase'],'committed');plan=rw.export(path)
         with self.assertRaises(ValueError):rw.export(path,reviewed_hash='0'*64)

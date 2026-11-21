@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ScholarFlow Research Workbench",
   description: "A local-first, evidence-grounded graduate research workspace.",
+  icons: { icon: "/brand/scholarflow-icon.png" },
 };
 
 export default function RootLayout({

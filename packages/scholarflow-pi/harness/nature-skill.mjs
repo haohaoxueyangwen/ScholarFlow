@@ -13,7 +13,7 @@ export function natureSkillBundle({env = process.env, spawn = spawnSync, python 
   if (result.status !== 0) throw new Error("Nature Skill validation failed: " + String(result.stderr || "unavailable").trim());
   let data;
   try { data = JSON.parse(result.stdout); } catch { throw new Error("Invalid Nature Skill validation result"); }
-  if (!data.active || !Array.isArray(data.skill_paths) || data.skill_paths.length !== 1 || typeof data.skill_paths[0] !== "string"
+  if (!data.active || !Array.isArray(data.skill_paths) || !data.skill_paths.length || data.skill_paths.some(path => typeof path !== "string")
       || !Array.isArray(data.resources) || !data.resources.length || data.resources.some(item => typeof item.path !== "string" || !/^[a-f0-9]{64}$/.test(item.sha256))) {
     throw new Error("Nature Skill is not installed and explicitly activated");
   }

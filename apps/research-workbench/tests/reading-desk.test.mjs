@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { canAskKnowledge, draftKey, isSameScope, readDraft, researchRequest, turnStateText, uniquePdfSources, writeDraft } from "../app/lib/research-desk.ts";
+import { canAskKnowledge, draftKey, isSameScope, previewMatches, readDraft, readReviewDraft, researchRequest, turnStateText, uniquePdfSources, writeDraft, writeReviewDraft } from "../app/lib/research-desk.ts";
 
 test("drafts are isolated by both project and workspace and survive remounts", () => {
   const values = new Map();
@@ -16,6 +16,24 @@ test("drafts are isolated by both project and workspace and survive remounts", (
   assert.equal(readDraft(storage, "project-b", "workspace-a").value, "");
   assert.equal(writeDraft(storage, "project-a", "workspace-a", ""), true);
   assert.equal(readDraft(storage, "project-a", "workspace-a").value, "");
+});
+
+test("review draft recovery is bound to project, workspace and exact proposal version", () => {
+  const values = new Map();
+  const storage = { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value), removeItem: (key) => values.delete(key) };
+  const draft = { proposalId: "p1", proposalHash: "hash1", title: "Edited", content: "Narrow claim", requestId: "revision-" + "a".repeat(32), submitted: true };
+  assert.equal(writeReviewDraft(storage, "a", "w", draft, "p1", "hash1"), true);
+  assert.deepEqual(readReviewDraft(storage, "a", "w", "p1", "hash1"), draft);
+  assert.equal(readReviewDraft(storage, "b", "w", "p1", "hash1"), null);
+  assert.equal(readReviewDraft(storage, "a", "other", "p1", "hash1"), null);
+  assert.equal(readReviewDraft(storage, "a", "w", "p1", "hash2"), null);
+});
+
+test("project preview becomes invalid when any reviewed field changes", () => {
+  const preview = { changes: { project_name: "a", title: "b", goal: "c" } };
+  assert.equal(previewMatches(preview, "a", "b", "c"), true);
+  assert.equal(previewMatches(preview, "a", "b", "changed"), false);
+  assert.equal(previewMatches(null, "a", "b", "c"), false);
 });
 
 test("unavailable browser storage is reported instead of pretending to save", () => {

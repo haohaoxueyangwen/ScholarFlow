@@ -123,6 +123,15 @@ class WebResearchTests(unittest.TestCase):
             rejected=self.service.decide(result['workspace_id'],{'stage_id':'stage-A','proposal_id':proposal['proposal']['proposal_id'],'reviewed_hash':proposal['proposal_hash'],'decision':'reject'})
         self.assertEqual(rejected['phase'],'rejected');index.assert_not_called()
         self.assertIsNone(self.store.get_research_artifact(rw.load(path)['pdf']['artifact_id']))
+    def test_web_revision_keeps_project_scope_and_does_not_index(self):
+        result=self.create();path,_=self.service._path(result['workspace_id'],'stage-A');old=fixtures.WorkspaceTests().proposal(path)
+        payload={'stage_id':'stage-A','proposal_id':old['proposal']['proposal_id'],'reviewed_hash':old['proposal_hash'],
+                 'title':'Narrower note','content':'Only the supported finding.','request_id':'revision-'+'a'*32}
+        with patch.object(self.service,'index') as index:
+            revised=self.service.revise(result['workspace_id'],payload)
+            index.assert_not_called()
+        self.assertEqual(revised['phase'],'pending');self.assertFalse(self.store.list_research_artifacts())
+        with self.assertRaises(DomainQueryError):self.service.revise(result['workspace_id'],{**payload,'stage_id':'stage-a'})
     def test_index_start_error_reports_committed_note_without_rollback(self):
         result=self.create();path,_=self.service._path(result['workspace_id'],'stage-A');proposal=fixtures.WorkspaceTests().proposal(path)
         with patch.object(self.service,'index',side_effect=RuntimeError('index temporarily offline')):
@@ -157,6 +166,19 @@ class WebResearchTests(unittest.TestCase):
         self.assertEqual(self.service.get(result['workspace_id'], 'stage-A')['knowledge']['status'], 'failed')
         self.assertIsNotNone(self.store.get_research_artifact(rw.load(path)['pdf']['artifact_id']))
         self.assertNotIn(result['workspace_id'], self.service._indexing)
+
+    def test_index_never_copies_embedding_configuration_from_another_library(self):
+        result=self.create();path,_=self.service._path(result['workspace_id'],'stage-A')
+        other=self.fixture.root/'unrelated-default';other.mkdir()
+        atomic_write_json(other/'embedding-runtime.json',{'synthetic':'must-not-copy'})
+        from scholarflow.knowledge_jobs import SyncJobStore
+        proposal=fixtures.WorkspaceTests().proposal(path)
+        with patch.object(self.service,'index',return_value={'status':'queued'}):
+            self.service.decide(result['workspace_id'],{'stage_id':'stage-A','proposal_id':proposal['proposal']['proposal_id'],'reviewed_hash':proposal['proposal_hash']})
+        job=SyncJobStore(self.data).records()[0]
+        with patch.object(rw,'DEFAULT_DATA',other/'facts'), patch.object(self.service,'_index_commands',side_effect=RuntimeError('synthetic failure')):
+            self.service._run_index(path,result['workspace_id'],job)
+        self.assertFalse((wk.home_for(rw.load(path))/'embedding-runtime.json').exists())
 
     def test_knowledge_question_waits_for_real_index(self):
         result=self.create()

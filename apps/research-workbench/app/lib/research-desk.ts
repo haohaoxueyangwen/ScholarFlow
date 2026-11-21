@@ -29,6 +29,35 @@ export function browserStorage(): Storage | null {
   try { return window.localStorage; } catch { return null; }
 }
 
+export type ReviewDraft = { proposalId: string; proposalHash: string; title: string; content: string; requestId: string; submitted: boolean };
+
+export function reviewDraftKey(project: string, workspace: string, proposalId: string, proposalHash: string): string {
+  return `scholarflow:reading-desk:review:${[project, workspace, proposalId, proposalHash].map(encodeURIComponent).join(":")}`;
+}
+
+export function readReviewDraft(storage: Storage | null, project: string, workspace: string, proposalId: string, proposalHash: string): ReviewDraft | null {
+  try {
+    const raw = storage?.getItem(reviewDraftKey(project, workspace, proposalId, proposalHash));
+    if (!raw) return null;
+    const value = JSON.parse(raw) as ReviewDraft;
+    return value.proposalId === proposalId && value.proposalHash === proposalHash && typeof value.title === "string" && typeof value.content === "string"
+      && /^revision-[a-f0-9]{32}$/.test(value.requestId) && typeof value.submitted === "boolean" ? value : null;
+  } catch { return null; }
+}
+
+export function writeReviewDraft(storage: Storage | null, project: string, workspace: string, draft: ReviewDraft | null, proposalId: string, proposalHash: string): boolean {
+  try {
+    if (!storage) throw new Error("storage unavailable");
+    const key = reviewDraftKey(project, workspace, proposalId, proposalHash);
+    if (draft) storage.setItem(key, JSON.stringify(draft)); else storage.removeItem(key);
+    return true;
+  } catch { return false; }
+}
+
+export function previewMatches(preview: { changes: { project_name?: string; title?: string; goal?: string } } | null, name: string, title: string, goal: string): boolean {
+  return Boolean(preview && preview.changes.project_name === name && preview.changes.title === title && preview.changes.goal === goal);
+}
+
 export function canAskKnowledge(workspace: { knowledge_available: boolean }): boolean {
   return workspace.knowledge_available === true;
 }

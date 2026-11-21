@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { SafeMarkdown } from "@/app/components/safe-markdown";
-import { browserStorage, canAskKnowledge, isSameScope, readDraft, researchApiBase, researchRequest, turnStateText, uniquePdfSources, writeDraft, type DeskScope } from "@/app/lib/research-desk";
+import { browserStorage, canAskKnowledge, isSameScope, previewMatches, readDraft, readReviewDraft, researchApiBase, researchRequest, turnStateText, uniquePdfSources, writeDraft, writeReviewDraft, type DeskScope, type ReviewDraft } from "@/app/lib/research-desk";
 
 const deskFetch = (path: string, init?: RequestInit) => researchRequest(researchApiBase(), path, init);
 
@@ -42,7 +42,8 @@ export function ReadingDesk() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [stage, setStage] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [hash, setHash] = useState("");
+  const [review, setReview] = useState<ReviewDraft | null>(null);
+  const [reviewStorageAvailable, setReviewStorageAvailable] = useState(true);
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [goal, setGoal] = useState("");
@@ -61,17 +62,18 @@ export function ReadingDesk() {
   const [busy, setBusy] = useState("");
   const current = useRef<DeskScope>({ stage: "", id: "", generation: 0 });
   const messageRef = useRef("");
+  const previewRevision = useRef(0);
 
   function chooseProject(nextStage: string) {
     current.current = { stage: nextStage, id: "", generation: current.current.generation + 1 };
     setStage(nextStage); setWorkspace(null); setSaved([]); setSavedError(""); setFile(null);
-    setMessage(""); messageRef.current = ""; setExternalConsent(false); setError(""); setBusy("");
+    setMessage(""); messageRef.current = ""; setReview(null); setPreview(null); previewRevision.current++; setExternalConsent(false); setError(""); setBusy("");
   }
 
   function showWorkspace(next: Workspace, expected: DeskScope) {
     if (!isSameScope(current.current, expected) || next.stage_id !== expected.stage) return;
     current.current = { ...expected, id: next.workspace_id };
-    setWorkspace(next); setPdfPage(1); setExternalConsent(false);
+    setWorkspace(next); setPdfPage(1); setReview(null); setExternalConsent(false);
     const draft = readDraft(browserStorage(), next.stage_id, next.workspace_id);
     setMessage(draft.value); messageRef.current = draft.value; setDraftStorageAvailable(draft.available);
   }
@@ -109,37 +111,39 @@ export function ReadingDesk() {
   }, [workspace]);
 
   useEffect(() => {
-    if (draftStorageAvailable || !message) return;
+    if ((draftStorageAvailable || !message) && (reviewStorageAvailable || !review)) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [draftStorageAvailable, message]);
+  }, [draftStorageAvailable, message, reviewStorageAvailable, review]);
 
   async function createPreview(event: FormEvent) {
     event.preventDefault();
     const scope = { ...current.current };
+    const revision = previewRevision.current;
+    const fields = { project_name: name, title, goal };
     setBusy("preview"); setError("");
     try {
       const result = await readJson<Preview>(await deskFetch("/projects/preview", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_name: name, title, goal }),
+        body: JSON.stringify(fields),
       }));
-      if (isSameScope(current.current, scope)) { setPreview(result); setHash(""); }
+      if (isSameScope(current.current, scope) && revision === previewRevision.current) setPreview(result);
     } catch (reason) { if (isSameScope(current.current, scope)) setError(reason instanceof Error ? reason.message : "无法生成预览"); }
     finally { if (isSameScope(current.current, scope)) setBusy(""); }
   }
 
   async function commitProject() {
-    if (!preview || hash.trim() !== preview.proposal_hash) { setError("请输入预览里的精确 hash。"); return; }
+    if (!preview || !previewMatches(preview, name, title, goal)) { setError("项目内容已变化，请重新生成预览。"); return; }
     const scope = { ...current.current };
     setBusy("commit"); setError("");
     try {
       const created = await readJson<{ stage_id: string }>(await deskFetch("/projects/commit", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request_id: preview.request_id, reviewed_hash: hash.trim() }),
+        body: JSON.stringify({ request_id: preview.request_id, reviewed_hash: preview.proposal_hash }),
       }));
       if (!isSameScope(current.current, scope)) return;
-      chooseProject(created.stage_id); setPreview(null); setName(""); setTitle(""); setGoal(""); setHash("");
+      chooseProject(created.stage_id); setPreview(null); setName(""); setTitle(""); setGoal("");
       await refreshProjects();
     } catch (reason) { if (isSameScope(current.current, scope)) setError(reason instanceof Error ? reason.message : "未创建项目"); }
     finally { if (isSameScope(current.current, scope)) setBusy(""); }
@@ -219,6 +223,41 @@ export function ReadingDesk() {
     finally { if (isSameScope(current.current, scope)) setBusy(""); }
   }
 
+  function startReview(proposal: Proposal) {
+    if (!workspace) return;
+    const id = proposal.proposal.proposal_id;
+    const restored = readReviewDraft(browserStorage(), workspace.stage_id, workspace.workspace_id, id, proposal.proposal_hash);
+    const next = restored || { proposalId: id, proposalHash: proposal.proposal_hash, title: proposal.proposal.normalized_changes?.title || "", content: proposal.proposal.normalized_changes?.content || "", requestId: `revision-${crypto.randomUUID().replaceAll("-", "")}`, submitted: false };
+    setReview(next);
+    setReviewStorageAvailable(writeReviewDraft(browserStorage(), workspace.stage_id, workspace.workspace_id, next, id, proposal.proposal_hash));
+  }
+
+  function updateReview(next: ReviewDraft) {
+    if (!workspace) return;
+    setReview(next);
+    setReviewStorageAvailable(writeReviewDraft(browserStorage(), workspace.stage_id, workspace.workspace_id, next, next.proposalId, next.proposalHash));
+  }
+
+  async function submitReview() {
+    if (!workspace || !review || !review.title.trim() || !review.content.trim()) return;
+    const original = workspace.proposals.find((item) => item.proposal.proposal_id === review.proposalId)?.proposal.normalized_changes;
+    if (!review.submitted && (review.title.trim().length > 1000 || review.content.trim().length > 12000)) { setError("标题或正文超出长度限制。"); return; }
+    if (!review.submitted && review.title.trim() === original?.title && review.content.trim() === original?.content) { setError("请先修改标题或正文，再生成修订提案。"); return; }
+    const scope = { ...current.current };
+    const submitted = { ...review, submitted: true };
+    updateReview(submitted); setBusy("revise"); setError("");
+    try {
+      await readJson(await deskFetch(`/workspaces/${encodeURIComponent(scope.id)}/revise`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stage_id: scope.stage, proposal_id: submitted.proposalId, reviewed_hash: submitted.proposalHash, title: submitted.title, content: submitted.content, request_id: submitted.requestId }),
+      }));
+      if (!isSameScope(current.current, scope)) return;
+      writeReviewDraft(browserStorage(), scope.stage, scope.id, null, submitted.proposalId, submitted.proposalHash);
+      setReview(null); await refreshWorkspace(scope);
+    } catch (reason) { if (isSameScope(current.current, scope)) setError(reason instanceof Error ? `${reason.message}；修订草稿已保留，可重试。` : "修订未完成，请重试。"); }
+    finally { if (isSameScope(current.current, scope)) setBusy(""); }
+  }
+
   async function retryIndex() {
     if (!workspace) return;
     const scope = { ...current.current };
@@ -249,12 +288,12 @@ export function ReadingDesk() {
         <ul>{projects.map((project) => <li key={project.stage_id}><button type="button" className={project.stage_id === stage ? "selected" : ""} onClick={() => chooseProject(project.stage_id)}>{project.project_name || project.title}<small>{project.goal}</small></button></li>)}</ul>
         <form onSubmit={createPreview}>
           <p className="reading-kicker">新建</p>
-          <input aria-label="项目名称" placeholder="项目名称" value={name} onChange={(event) => setName(event.target.value)} required />
-          <input aria-label="阶段标题" placeholder="阶段标题" value={title} onChange={(event) => setTitle(event.target.value)} required />
-          <textarea aria-label="研究目标" placeholder="研究目标" value={goal} onChange={(event) => setGoal(event.target.value)} required />
+          <input aria-label="项目名称" placeholder="项目名称" value={name} onChange={(event) => { previewRevision.current++; setPreview(null); setName(event.target.value); }} required />
+          <input aria-label="阶段标题" placeholder="阶段标题" value={title} onChange={(event) => { previewRevision.current++; setPreview(null); setTitle(event.target.value); }} required />
+          <textarea aria-label="研究目标" placeholder="研究目标" value={goal} onChange={(event) => { previewRevision.current++; setPreview(null); setGoal(event.target.value); }} required />
           <button type="submit" disabled={Boolean(busy)}>生成预览</button>
         </form>
-        {preview && <div className="reading-preview"><p>尚未创建。核对后输入精确 hash。</p><code>{preview.proposal_hash}</code><input aria-label="精确 hash" value={hash} onChange={(event) => setHash(event.target.value)} /><button type="button" onClick={() => void commitProject()} disabled={busy === "commit"}>确认创建</button></div>}
+        {preview && <div className="reading-preview"><p>请核对项目，确认后创建：</p><strong>{preview.changes.project_name}</strong><span>{preview.changes.title}</span><p>{preview.changes.goal}</p><button type="button" onClick={() => void commitProject()} disabled={Boolean(busy) || !previewMatches(preview, name, title, goal)}>确认创建项目</button></div>}
         <label className="reading-file" onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setFile(event.dataTransfer.files[0] ?? null); }}>PDF：{file?.name || "选择文件或拖到这里"}<input key={stage} aria-label="选择 PDF" type="file" accept="application/pdf,.pdf" onChange={(event) => setFile(event.target.files?.[0] ?? null)} /></label>
         <label>授权页<input aria-label="授权页" value={pages} onChange={(event) => setPages(event.target.value)} /></label>
         <label>新工作区使用的模型<select aria-label="选择模型" value={provider} onChange={(event) => setProvider(event.target.value)}><option value="scholarflow-local">本地 Qwen</option><option value="deepseek">DeepSeek（外部 API）</option></select></label>
@@ -272,7 +311,21 @@ export function ReadingDesk() {
         {error && <p className="reading-error" role="alert">{error}</p>}
         <div className="reading-thread">
           {workspace?.turns.map((turn) => <article key={turn.turn_id}><p className="reading-user">{turn.message}</p>{turn.status === "completed" ? <SafeMarkdown content={turn.answer || ""} /> : <p>{turnStateText(turn.status, turn.error)}</p>}{turn.sources?.map((source) => <div className="reading-source" key={source.reference_id || source.title}><strong>{source.title || "来源"}</strong><small>{source.reference_id}</small><p>{source.text}</p>{uniquePdfSources(source.pdf_sources || []).map((pdf) => pdf.import_id === workspace.pdf?.import_id ? <button type="button" key={`${pdf.import_id}-${pdf.anchor?.page_start}`} onClick={() => setPdfPage(pdf.anchor?.page_start || 1)}>打开第 {pdf.anchor?.page_start} 页</button> : <a key={`${pdf.import_id}-${pdf.anchor?.page_start}`} href={`${api}/imports/${encodeURIComponent(pdf.import_id || "")}/pdf#page=${pdf.anchor?.page_start}`} target="_blank" rel="noreferrer">打开来源 PDF 第 {pdf.anchor?.page_start} 页</a>)}</div>)}</article>)}
-          {workspace?.proposals.map((proposal) => <article className="reading-note" key={proposal.proposal.proposal_id}><span>{proposal.phase === "committed" ? "已保存" : proposal.phase === "rejected" ? "已拒绝" : "待审阅"}</span><h3>{proposal.proposal.normalized_changes?.title || "阅读笔记"}</h3><SafeMarkdown content={proposal.proposal.normalized_changes?.content || ""} />{proposal.proposal.normalized_changes?.source_snapshot?.sources?.map((source) => <button type="button" key={source.source_id} onClick={() => setPdfPage(source.anchor?.page_start || 1)}>来源第 {source.anchor?.page_start || "?"} 页</button>)}<code>{proposal.proposal_hash}</code>{["pending", "approved_pending"].includes(proposal.phase) && <div><button type="button" onClick={() => void decide(proposal, "approve")} disabled={blocked}>确认保存并入库</button><button type="button" onClick={() => void decide(proposal, "reject")} disabled={blocked}>拒绝</button></div>}</article>)}
+          {workspace?.proposals.map((proposal) => {
+            const id = proposal.proposal.proposal_id;
+            const editing = review?.proposalId === id && review.proposalHash === proposal.proposal_hash;
+            const recoverable = proposal.phase === "rejected" && Boolean(readReviewDraft(browserStorage(), workspace.stage_id, workspace.workspace_id, id, proposal.proposal_hash)?.submitted);
+            return <article className="reading-note" key={id}>
+              <span>{proposal.phase === "committed" ? "已保存" : proposal.phase === "rejected" ? "已拒绝或被修订" : proposal.phase === "pending" ? "待审阅" : proposal.phase}</span>
+              <h3>{proposal.proposal.normalized_changes?.title || "阅读笔记"}</h3>
+              <SafeMarkdown content={proposal.proposal.normalized_changes?.content || ""} />
+              <details><summary>核对原文来源</summary>{proposal.proposal.normalized_changes?.source_snapshot?.sources?.map((source) => <div className="reading-source" key={source.source_id}><button type="button" onClick={() => setPdfPage(source.anchor?.page_start || 1)}>打开第 {source.anchor?.page_start || "?"} 页</button><p>{source.text}</p></div>)}</details>
+              {["pending", "approved_pending"].includes(proposal.phase) && <p>请逐项核对原文；AI 可能把原文概括得过强。</p>}
+              {editing && review && <div className="reading-review-editor"><label>修订标题<input aria-label="修订标题" maxLength={1000} value={review.title} disabled={review.submitted} onChange={(event) => updateReview({ ...review, title: event.target.value })} /></label><label>修订正文<textarea aria-label="修订正文" maxLength={12000} rows={10} value={review.content} disabled={review.submitted} onChange={(event) => updateReview({ ...review, content: event.target.value })} /></label><small>{review.submitted ? "修订已提交处理中断；请重试完成，原版本不会保存。" : reviewStorageAvailable ? "修订草稿仅保存在当前浏览器；生成新提案后仍需确认。" : "浏览器无法保存草稿，离开前请自行复制。"}</small><button type="button" disabled={blocked || !review.title.trim() || !review.content.trim()} onClick={() => void submitReview()}>{review.submitted ? "重试完成修订" : "生成修订提案"}</button>{!review.submitted && <button type="button" onClick={() => { writeReviewDraft(browserStorage(), workspace.stage_id, workspace.workspace_id, null, id, proposal.proposal_hash); setReview(null); }}>取消编辑</button>}</div>}
+              {!editing && (proposal.phase === "pending" || recoverable) && <button type="button" disabled={blocked} onClick={() => startReview(proposal)}>{recoverable ? "恢复未完成修订" : "编辑提案"}</button>}
+              {!editing && ["pending", "approved_pending"].includes(proposal.phase) && <div><button type="button" onClick={() => void decide(proposal, "approve")} disabled={blocked}>确认保存并入库</button><button type="button" onClick={() => void decide(proposal, "reject")} disabled={blocked}>拒绝</button></div>}
+            </article>;
+          })}
           {workspace && (["failed", "stale", "interrupted"].includes(workspace.knowledge.status) || (workspace.knowledge.status === "not_queued" && workspace.proposals.some((item) => item.phase === "committed"))) && <p className="reading-error">笔记已保存，知识入库尚未完成。{workspace.knowledge.error_code && ` ${workspace.knowledge.error_code}`} <button type="button" onClick={() => void retryIndex()} disabled={blocked}>重试入库</button></p>}
         </div>
         <form onSubmit={(event) => { event.preventDefault(); void send("chat"); }}>

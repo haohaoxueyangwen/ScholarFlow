@@ -27,7 +27,7 @@
     },
     {
       "path": "apps/research-workbench/app/components/reading-desk.tsx",
-      "sha256": "ff6a5dedc7c77e302f944e954ef9027c0273b49697bcc41fe0a0378db7f0a04c"
+      "sha256": "e81324ad9a22e3784f63379cdc0fa8f1a6b58a66ef79980a69c50ee190d69ecc"
     },
     {
       "path": "apps/research-workbench/app/components/research-loop-workspace.tsx",
@@ -46,12 +46,16 @@
       "sha256": "d07cdb554b5f332f0a3cb2d141d9be2ccfa53d0a7c64ec8cffedc651de3a0830"
     },
     {
+      "path": "apps/research-workbench/app/favicon.ico/route.ts",
+      "sha256": "dfb320edf6471a3963f5bf41807d63cabaf27ceceade743dc2d61797f483d6fc"
+    },
+    {
       "path": "apps/research-workbench/app/globals.css",
-      "sha256": "986a7384ca34c276387983e255c14fa812c5e61e6ec14302c353be8a9a9ca62e"
+      "sha256": "5b119b68836cac16db37cecf11989f54db65c547e04194c90a287e5372360a7b"
     },
     {
       "path": "apps/research-workbench/app/layout.tsx",
-      "sha256": "9190c37ff49a421fd3f50b86b8f20d5c22288b46c6da2da496f6c09395cbd576"
+      "sha256": "245777588c466093ed23423a85cd1eebce541cce7f438d9bb6b5a6f4ef4d10ca"
     },
     {
       "path": "apps/research-workbench/app/lib/api.ts",
@@ -91,7 +95,7 @@
     },
     {
       "path": "apps/research-workbench/app/lib/research-desk.ts",
-      "sha256": "346c35455108a66012f44573a78c64ab3ea780263672ea752cb5d98c9dce92e1"
+      "sha256": "5257f7fceffb69a40ed2080c5975222afbaaa68b1349f49e2ac8cc637a12c359"
     },
     {
       "path": "apps/research-workbench/app/lib/types.ts",
@@ -128,6 +132,10 @@
     {
       "path": "apps/research-workbench/postcss.config.mjs",
       "sha256": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde"
+    },
+    {
+      "path": "apps/research-workbench/public/brand/scholarflow-icon.png",
+      "sha256": "1ca33c76af1782206f75cc5ba0fa90b52e0a25e3025144cf68198dde8cbf7b51"
     },
     {
       "path": "apps/research-workbench/quality/dependency-exceptions.json",
@@ -171,7 +179,7 @@
     },
     {
       "path": "apps/research-workbench/tests/reading-desk.test.mjs",
-      "sha256": "a19e2bd22cea627bfcace907c0c53a9aa9878eef005fe916575ea0f9097a1af3"
+      "sha256": "a6fb47ccc32ffc4b4acfdb22b62d0f1ba26b565884d0552de85aaa262cc7c3a7"
     },
     {
       "path": "apps/research-workbench/tests/rendered-html.test.mjs",
@@ -199,7 +207,7 @@
     },
     {
       "path": "docs/public/Windows使用说明.md",
-      "sha256": "cd3f1432ede7924d8b0713593b7a2895a6bcaa0733d1d23d1e62b0dfdbc50c09"
+      "sha256": "4354fc34149107fb7882d625a34d0d668a51695bba6e6d3fa2f205684b7ba3e6"
     },
     {
       "path": "environment-scholar.yml",
@@ -555,7 +563,7 @@
     },
     {
       "path": "packages/scholarflow-pi/harness/nature-skill.mjs",
-      "sha256": "60ac25ad77e58a1021436655eaee491ca5c7498783f9087b795428ef7d2e82b0"
+      "sha256": "9a55cff043d7948622e5bfb3062eceb0f3928dd8c3918217d2833c9a292a6aba"
     },
     {
       "path": "packages/scholarflow-pi/harness/operation-client.ts",
@@ -663,7 +671,7 @@
     },
     {
       "path": "packages/scholarflow-pi/quality/nature-skill-integration.test.mjs",
-      "sha256": "cfd1c311b59ab2ba3382844ac79dd5b416ddc356e3d73fa1e7adf1aecef76411"
+      "sha256": "d8621d69889b1b88380f0dc454d2997bb9e14d6b42fd89e4d745a5424c87c4fb"
     },
     {
       "path": "packages/scholarflow-pi/quality/nature-skill.test.mjs",
@@ -1003,7 +1011,7 @@
     },
     {
       "path": "scholarflow/nature_skill_package.py",
-      "sha256": "997406fe56f85f6470ae0f274e95bbf80dba4d5d7652c93a3e85c56dee55e03f"
+      "sha256": "a38971b2c10bc7ef98817ecdfc8a04d4c811e200332f2091e1669a57c8d12eee"
     },
     {
       "path": "scholarflow/note_projection.py",
@@ -1095,7 +1103,7 @@
     },
     {
       "path": "scholarflow/research_http.py",
-      "sha256": "a7ea3bc5724e4a8718190964cb32d721e67b9863fee46df5c7c7d7c250253e30"
+      "sha256": "5cf17fbe6658be70222205eef9fc84a9abfc06d353a37c815ea79012d32d3dc9"
     },
     {
       "path": "scholarflow/research_mutations.py",
@@ -1107,7 +1115,7 @@
     },
     {
       "path": "scholarflow/research_workspace.py",
-      "sha256": "1fe27decfda30111a6ca5eb4e078dc824ab5b999cdb71939b61ac8fe3f203eb1"
+      "sha256": "24a281b83c47fe29d561903a9afc5bb29090a43bddac01823f1802e3bc7549df"
     },
     {
       "path": "scholarflow/retrieval.py",
@@ -1151,7 +1159,7 @@
     },
     {
       "path": "scholarflow/web_research.py",
-      "sha256": "05bcf5cf7c9bc2294835f83094cd21cbdff13fbd40de5243d42d61c0f2d4591e"
+      "sha256": "54721b157ce2f313bfcf1193b877a674064f397d4ea2cae599e6a0046be2f51c"
     },
     {
       "path": "scholarflow/workbench_agent.py",
@@ -1267,7 +1275,7 @@
     },
     {
       "path": "scripts/scholarflow-agent.py",
-      "sha256": "d6738c541e1f60d32aa0de014daa277500eb428b21ec606dacc330dea7086296"
+      "sha256": "4d928dd038b185001a75cdfa099cb05d4821bc29ac35d7a8d5892597a2c6f0ab"
     },
     {
       "path": "scripts/scholarflow-local.ps1",
@@ -1319,7 +1327,7 @@
     },
     {
       "path": "tests/test_nature_skill_package.py",
-      "sha256": "fcc5d828377898af88f3d2b9f420c175677a92e8aba46c094461879f549ebfac"
+      "sha256": "d0eb915ad852e61c709a1455139a0bb075959b83f18e5ed3ed1e6a4392d39349"
     },
     {
       "path": "tests/test_portable_auth.py",
@@ -1347,11 +1355,11 @@
     },
     {
       "path": "tests/test_research_http_security.py",
-      "sha256": "05f71e45a0085e9b233d4cc0983d9a8a2754763dad2904b5d12757c40f2c7e81"
+      "sha256": "6733e6f6519a9aabdfa378e49443c9fbaca077c948c6c325c3e5d9d97c74a3a4"
     },
     {
       "path": "tests/test_research_workspace.py",
-      "sha256": "6d771f3b6dbf378b6b00af1c59964cd02387f8efa261c8e98e8e5d69f87c0ef4"
+      "sha256": "8bb6a961d382182fbf56f19269c38b6ee2a0ea06f1c7d11dae812518f6e4a2fe"
     },
     {
       "path": "tests/test_scholarflow_agent_cli.py",
@@ -1363,7 +1371,7 @@
     },
     {
       "path": "tests/test_web_research_loop.py",
-      "sha256": "89021ed749942ce0d7f62c318aad4990910f4e0573effd7d54a026b2044b5bf1"
+      "sha256": "e53d0fd64985652bdf23ac81aa25595e11292b59b4e6c49cdd543c5c2402938c"
     },
     {
       "path": "tests/test_windows_process_parent.py",

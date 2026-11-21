@@ -12,6 +12,7 @@ import json
 import os
 import re
 import secrets
+import signal
 import subprocess
 import tarfile
 from pathlib import Path, PurePosixPath
@@ -19,10 +20,16 @@ from pathlib import Path, PurePosixPath
 from .persistence import atomic_write_json, file_lock
 
 UPSTREAM = "https://github.com/Yuan1z0825/nature-skills.git"
-PIN = "1ea82ffff20f40077bf84b74182f55eeaf3d111d"
-EXPECTED_FILES = 91
-EXPECTED_TREE = "dcc03c04f50aa126020436f079abdedf7592d470306f53fa6b403039a9ec571b"
-MAX_ARCHIVE = 30_000_000
+LEGACY_PIN = "1ea82ffff20f40077bf84b74182f55eeaf3d111d"
+LEGACY_FILES = 91
+LEGACY_TREE = "dcc03c04f50aa126020436f079abdedf7592d470306f53fa6b403039a9ec571b"
+# Fixed upstream snapshot, not an approval to run its scripts. Changing this
+# requires a new source/permission/compatibility review and pinned hash.
+PIN = "a65a8364b419e05f7d8d5d96842a1ff7e544b1bb"
+EXPECTED_FILES = 820
+EXPECTED_TREE = "f22ca3baeb5aee2cc9831d0fd263347a73b6cd60090299b4a93e03cca2d72b02"
+MAX_ARCHIVE = 70_000_000
+TEXT_EXTENSIONS = {".md", ".yaml", ".yml", ".json", ".py", ".tex", ".txt", ".tsv", ".toml", ".mjs", ".js", ".sh", ".R", ".bib", ".ris", ".html", ".css", ".svg"}
 
 
 class NaturePackageError(ValueError):
@@ -49,13 +56,42 @@ def _git_env() -> dict[str, str]:
             "GIT_TERMINAL_PROMPT": "0", "GIT_NO_LAZY_FETCH": "1"}
 
 
+def _run_git_owned(command: list[str], *, timeout: int) -> None:
+    """Run one owned Git process tree with a bounded timeout and no pipe leak."""
+    options = {"env": _git_env(), "stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+    if os.name == "nt": options["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else: options["start_new_session"] = True
+    try:
+        process = subprocess.Popen(command, **options)
+        try:
+            code = process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired as error:
+            try:
+                if os.name == "nt":
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=False)
+                else:
+                    os.killpg(process.pid, signal.SIGKILL)
+            except (OSError, subprocess.SubprocessError):
+                process.kill()
+            try: process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                try: process.wait(timeout=5)
+                except subprocess.TimeoutExpired: pass
+            raise NaturePackageError("Upstream fetch timed out; no active skill was changed") from error
+        if code != 0:
+            raise NaturePackageError("Could not fetch upstream; no active skill was changed")
+    except OSError as error:
+        raise NaturePackageError("Could not run Git; no active skill was changed") from error
+
+
 def _archive(checkout: Path) -> dict[str, bytes]:
     checkout = _canonical(checkout)
     if not checkout.is_dir():
         raise NaturePackageError("Pinned upstream checkout is unavailable")
     try:
         # Only these tracked paths are copied; uncommitted and untracked files are ignored.
-        result = subprocess.run(["git", "-c", "safe.directory=" + checkout.as_posix(), "-C", str(checkout), "archive", "--format=tar", PIN, "--", "LICENSE", "skills/nature-writing", "skills/nature-shared"],
+        result = subprocess.run(["git", "-c", "safe.directory=" + checkout.as_posix(), "-C", str(checkout), "archive", "--format=tar", PIN, "--", "LICENSE", "skills"],
                                 env=_git_env(), capture_output=True, timeout=55, check=True)
         if len(result.stdout) > MAX_ARCHIVE:
             raise NaturePackageError("Upstream archive exceeds the size budget")
@@ -67,12 +103,13 @@ def _archive(checkout: Path) -> dict[str, bytes]:
                 path = PurePosixPath(member.name)
                 if not member.isfile() or path.is_absolute() or ".." in path.parts or member.size > 5_000_000 or member.name in entries:
                     raise NaturePackageError("Unsafe upstream archive entry")
-                if member.name != "LICENSE" and not (member.name.startswith("skills/nature-writing/") or member.name.startswith("skills/nature-shared/")):
+                if member.name != "LICENSE" and not re.fullmatch(r"skills/nature-[a-z0-9-]+/.+", member.name):
                     raise NaturePackageError("Unexpected upstream path")
                 stream = archive.extractfile(member)
                 if stream is None:
                     raise NaturePackageError("Unreadable upstream entry")
-                entries[member.name] = stream.read().replace(b"\r\n", b"\n")
+                raw = stream.read()
+                entries[member.name] = raw.replace(b"\r\n", b"\n") if path.suffix in TEXT_EXTENSIONS else raw
         hashes = {name: hashlib.sha256(raw).hexdigest() for name, raw in entries.items()}
         if len(hashes) != EXPECTED_FILES or tree_hash(hashes) != EXPECTED_TREE:
             raise NaturePackageError("Upstream content differs from the reviewed pin")
@@ -86,7 +123,10 @@ class NatureSkillPackage:
         self.home = _canonical(home)
         self.base = self.home / "skills" / "nature-skills"
         self.versions = self.base / "versions"
-        self.active_file = self.base / "active.json"
+        # Keep the old activation readable by previously released clients,
+        # whose validator knows only the legacy pin.
+        self.active_file = self.base / "active-v2.json"
+        self.legacy_active_file = self.base / "active.json"
 
     def install(self, checkout: Path) -> str:
         entries = _archive(checkout)
@@ -116,7 +156,10 @@ class NatureSkillPackage:
                 raise NaturePackageError("Unsafe skill manifest")
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             expected = manifest.get("files")
-            if manifest.get("schema") != 1 or manifest.get("commit") != PIN or manifest.get("tree_sha256") != EXPECTED_TREE or not isinstance(expected, dict) or len(expected) != EXPECTED_FILES or tree_hash(expected) != EXPECTED_TREE:
+            commit = manifest.get("commit")
+            reviewed = {PIN: (EXPECTED_FILES, EXPECTED_TREE), LEGACY_PIN: (LEGACY_FILES, LEGACY_TREE)}
+            count, tree = reviewed.get(commit, (None, None))
+            if manifest.get("schema") != 1 or manifest.get("tree_sha256") != tree or not isinstance(expected, dict) or len(expected) != count or tree_hash(expected) != tree:
                 raise NaturePackageError("Skill manifest differs from the reviewed version")
             found = {}
             for current, dirs, files in os.walk(target, followlinks=False):
@@ -133,7 +176,12 @@ class NatureSkillPackage:
                     found[relative] = hashlib.sha256(file.read_bytes()).hexdigest()
             if found != expected:
                 raise NaturePackageError("Installed Nature Skill content has changed")
-            return {"active": version, "directory": str(target), "commit": PIN, "skill_paths": [str(target / "skills/nature-writing/SKILL.md")],
+            skill_names = sorted(name for name in expected if re.fullmatch(r"skills/nature-[a-z0-9-]+/SKILL\.md", name) and name != "skills/nature-shared/SKILL.md")
+            if not skill_names or "skills/nature-writing/SKILL.md" not in skill_names:
+                raise NaturePackageError("Reviewed bundle is missing Nature writing skills")
+            return {"active": version, "directory": str(target), "commit": commit,
+                    "skill_paths": [str(target / Path(name)) for name in skill_names],
+                    "skill_count": len(skill_names), "execution": "instructions_only; scripts and external services require separate capability and permission",
                     "resources": [{"path": str(target / Path(name)), "sha256": digest} for name, digest in sorted(expected.items())]}
         except (OSError, ValueError, TypeError) as error:
             if isinstance(error, NaturePackageError): raise
@@ -151,11 +199,12 @@ class NatureSkillPackage:
             return value
 
     def status(self, *, include_resources: bool = False) -> dict:
-        if not self.active_file.exists(): return {"active": None, "skill_paths": []}
+        active_file = self.active_file if self.active_file.exists() else self.legacy_active_file
+        if not active_file.exists(): return {"active": None, "skill_paths": []}
         try:
-            if _alias(self.active_file) or self.active_file.stat().st_nlink != 1:
+            if _alias(active_file) or active_file.stat().st_nlink != 1:
                 raise NaturePackageError("Unsafe activation record")
-            state = json.loads(self.active_file.read_text(encoding="utf-8"))
+            state = json.loads(active_file.read_text(encoding="utf-8"))
             if not isinstance(state, dict) or set(state) != {"schema", "version"} or state["schema"] != 1:
                 raise NaturePackageError("Invalid activation record")
             result = self._validate(state["version"])
@@ -170,10 +219,10 @@ class NatureSkillPackage:
         downloads.mkdir(parents=True, exist_ok=True)
         _canonical(downloads)
         target = downloads / ("nature-upstream-" + secrets.token_hex(8))
-        try:
-            subprocess.run(["git", "clone", "--no-checkout", "--", UPSTREAM, str(target)], env=_git_env(), capture_output=True, timeout=55, check=True)
-        except (OSError, subprocess.SubprocessError) as error:
-            raise NaturePackageError("Could not fetch upstream; no active skill was changed") from error
+        # Fetch only the reviewed commit, not the moving default branch or its
+        # full history. A newer upstream must never silently replace the pin.
+        _run_git_owned(["git", "init", "--quiet", "--", str(target)], timeout=20)
+        _run_git_owned(["git", "-C", str(target), "fetch", "--quiet", "--depth=1", "--no-tags", "--", UPSTREAM, PIN], timeout=120)
         return target
 
     def check_upstream(self) -> dict:
@@ -184,7 +233,10 @@ class NatureSkillPackage:
         fields = result.stdout.strip().split()
         if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]) or fields[1] != "refs/heads/main":
             raise NaturePackageError("Unexpected upstream revision response")
-        return {"reviewed_commit": PIN, "upstream_main": fields[0], "update_available": fields[0] != PIN, "active_version_changed": False}
+        active = self.status().get("commit")
+        return {"reviewed_commit": PIN, "active_commit": active, "upstream_main": fields[0],
+                "update_available": fields[0] != (active or PIN), "reviewed_candidate_available": bool(active and active != PIN),
+                "active_version_changed": False}
 
 
 def main() -> int:
