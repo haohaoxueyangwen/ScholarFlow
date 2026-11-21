@@ -195,7 +195,11 @@
     },
     {
       "path": "README.md",
-      "sha256": "644216a55c13464186d3906566dce2083e917815482f5727f3135b9f491e5cac"
+      "sha256": "2045ab98f4d804141aeedf3b5e363a6571cfcf297f5bfd1d99a4859548971459"
+    },
+    {
+      "path": "docs/public/Windows使用说明.md",
+      "sha256": "cd3f1432ede7924d8b0713593b7a2895a6bcaa0733d1d23d1e62b0dfdbc50c09"
     },
     {
       "path": "environment-scholar.yml",
@@ -1263,7 +1267,7 @@
     },
     {
       "path": "scripts/scholarflow-agent.py",
-      "sha256": "fe66f1d1a444af599a196ad98511d95c379371be3b22519ad2a3b3d59e45c7e2"
+      "sha256": "d6738c541e1f60d32aa0de014daa277500eb428b21ec606dacc330dea7086296"
     },
     {
       "path": "scripts/scholarflow-local.ps1",
@@ -1324,6 +1328,10 @@
     {
       "path": "tests/test_portable_knowledge.py",
       "sha256": "43bc39eceb593d3532b7e5aa0b217fcb10ea8215d65d9e815075536be10b05e5"
+    },
+    {
+      "path": "tests/test_portable_web_boot.py",
+      "sha256": "be03d229fb7eff7a2d82be10653dc402443be95bd43402acaea623bd62203f60"
     },
     {
       "path": "tests/test_research_continuity.py",

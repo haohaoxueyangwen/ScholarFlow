@@ -1,5 +1,7 @@
 # ScholarFlow
 
+[Windows 中文安装与使用说明](docs/public/Windows使用说明.md)
+
 ScholarFlow is a research-assistant project built around the Pi agent runtime.
 Pi handles model interaction and sessions; ScholarFlow provides research tools,
 evidence-linked notes, project-scoped knowledge, and reviewable write operations.

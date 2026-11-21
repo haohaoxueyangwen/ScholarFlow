@@ -154,6 +154,9 @@ def run(args) -> object:
             if args.status: command.append("--status")
         else:
             if os.name != "nt": raise ValueError("The optional desktop launcher currently requires Windows")
+            if not args.probe_only and not facts.is_dir():
+                if args.library_home: raise ValueError("The explicitly selected library must already contain a facts directory")
+                facts.mkdir(parents=True, exist_ok=True)
             command = ["powershell", "-NoProfile", "-File", str(ROOT / "scripts/research-desk-runtime.ps1"), "-DataDir", str(facts), "-WorkspaceHome", str(workspace_home), "-ApiPort", str(args.api_port), "-WebPort", str(args.web_port)]
             if args.no_browser: command.append("-NoBrowser")
             if args.probe_only: command.append("-ProbeOnly")
