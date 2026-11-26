@@ -36,6 +36,26 @@ class KnowledgeTests(unittest.TestCase):
             asyncio.run(wk.process(self.path));records=kb.records();r=records[0]
             self.assertTrue(kb.current(r));self.assertEqual(len(kb.scoped_records('stage-A')),1);self.assertEqual(kb.scoped_records('stage-a'),[])
             r['origin_artifact']['project_stage_id']='stage-a';self.assertFalse(kb.current(r))
+    def test_new_note_index_omits_anchor_json_but_keeps_structured_provenance(self):
+        self.save()
+        with patch.object(kb,'HOME',self.root),patch.object(kb,'ingest',new=AsyncMock(return_value={'results':[]})):
+            asyncio.run(wk.process(self.path));r=kb.records()[0]
+            self.assertEqual(r['origin_artifact']['render_version'],2)
+            self.assertNotIn('PDF anchors:',Path(r['path']).read_text(encoding='utf-8'))
+            self.assertTrue(r['origin_artifact']['pdf_sources'])
+            self.assertTrue(kb.current(r))
+    def test_legacy_cache_remains_current_and_is_not_overwritten(self):
+        self.save();job=wk.enqueue(self.path);_,note=wk.note_for(self.path)
+        cache=self.root/'managed-sources'/job['source_id']/(job['fingerprint'].removeprefix('sha256:')+'.md')
+        cache.parent.mkdir(parents=True);old=wk.render(note);cache.write_bytes(old.encode('utf-8'))
+        with patch.object(kb,'HOME',self.root),patch.object(kb,'ingest',new=AsyncMock(return_value={'results':[]})):
+            asyncio.run(wk.process(self.path));r=kb.records()[0]
+            self.assertEqual(cache.read_text(encoding='utf-8'),old)
+            self.assertEqual(r['origin_artifact']['render_version'],1)
+            r['origin_artifact'].pop('render_version')
+            self.assertTrue(kb.current(r))
+            r['origin_artifact']['render_version']=999
+            self.assertFalse(kb.current(r))
     def test_original_pdf_drift_blocks_previously_managed_source(self):
         self.save()
         with patch.object(kb,'HOME',self.root),patch.object(kb,'ingest',new=AsyncMock(return_value={'results':[]})):

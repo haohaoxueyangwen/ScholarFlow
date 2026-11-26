@@ -18,6 +18,7 @@ from scholarflow.domain_queries import DomainQueryError
 from scholarflow.reader_workspace import ReaderWorkspaceStore
 from scholarflow.persistence import atomic_write_json
 from scholarflow.web_research import WebResearchService, pi_worker_environment
+from scholarflow.desk_literature import DeskLiterature
 from scholarflow.workbench_api import build_server
 from scripts import library_knowledge as kb
 
@@ -34,6 +35,80 @@ class WebResearchTests(unittest.TestCase):
         self.service=WebResearchService(self.data)
     def tearDown(self):self.env.stop();self.fixture.tearDown()
     def create(self):return self.service.create({'stage_id':'stage-A','import_id':self.imported['import_id'],'pages':'1','provider':'deepseek'})
+    def test_literature_result_can_open_only_its_project_and_verified_oa_link(self):
+        from unittest.mock import Mock
+        hit={'provider':'openalex','result_id':'w1','doi':'10.9999/synthetic-a','title':'Synthetic study','authors':['Demo Author'],
+             'primary_url':'https://example.org/record','open_pdf_url':'https://example.org/open.pdf'}
+        searcher=Mock()
+        searcher.search.return_value=[hit,hit,{**hit,'doi':'10.9999/synthetic-b','title':'Only metadata','provider':'crossref'}]
+        fetch=Mock(return_value=(self.fixture.pdf.read_bytes(),'application/pdf','https://example.org/open.pdf'))
+        self.service.literature=DeskLiterature(searcher=searcher,fetcher=fetch)
+        self.assertEqual(self.service.list('stage-A')['items'],[])
+        results=self.service.search_literature({'stage_id':'stage-A','query':'synthetic optical paper','page':1})
+        searcher.search.assert_called_once_with('synthetic optical paper',limit=12)
+        self.assertEqual([row['pdf_available'] for row in results['items']],[True,False])
+        self.assertTrue(all('open_pdf_url' not in row for row in results['items']))
+        oa,closed=results['items']
+        action={'stage_id':'stage-A','candidate_id':oa['candidate_id'],'pages':'2','provider':'scholarflow-local'}
+        for invalid in ({'stage_id':'stage-a'},{'candidate_id':closed['candidate_id']},{'pages':'all'},{'pdf_url':'https://unrelated.example/fake.pdf'}):
+            with self.assertRaises(DomainQueryError):
+                self.service.open_literature({**action,**invalid})
+        fetch.assert_not_called()
+        opened=self.service.open_literature(action)
+        self.assertEqual(opened['pdf']['page_ranges'],[[2,2]])
+        self.assertEqual(opened['pdf']['import_id'],self.imported['import_id'])
+        self.assertEqual(self.service.open_literature(action)['workspace_id'],opened['workspace_id'])
+        fetch.assert_called_once()
+        self.assertEqual(self.service.list('stage-a')['items'],[])
+        self.assertEqual(opened['turns'],[])
+        self.assertFalse(opened['knowledge_available'])
+
+    def test_marks_are_versioned_per_project_and_restored_in_a_new_workspace(self):
+        first=self.create()['workspace_id']; second=self.create()['workspace_id']
+        mark={'stage_id':'stage-A','mark_id':'mark-'+'b'*32,'page':2,'quote':'A coded aperture','note':'My manual note',
+              'rects':[{'x':.1,'y':.1,'width':.35,'height':.015}]}
+        saved=self.service.save_mark(first,mark)
+        self.assertEqual(self.service.save_mark(first,mark),saved)
+        restarted=WebResearchService(self.data)
+        self.assertEqual(restarted.marks(second,'stage-A'),{'items':[saved]})
+        with self.assertRaises(DomainQueryError): restarted.marks(first,'stage-a')
+        with self.assertRaises(DomainQueryError): self.service.save_mark(first,{**mark,'note':'different intent'})
+        for invalid in ({'page':3}, {'page':True}, {'rects':[{'x':1,'y':.1,'width':.35,'height':.015}]}):
+            with self.assertRaises(DomainQueryError): self.service.save_mark(first,{**mark,'mark_id':'mark-'+'c'*32,**invalid})
+        other=rw.prepare(self.data,'stage-a',pdf=self.fixture.pdf,home=self.service.home)
+        self.assertEqual(restarted.marks(other.parent.name,'stage-a'),{'items':[]})
+        self.assertFalse(self.reader.annotations_path.exists())
+        self.assertEqual(self.service.get(first,'stage-A')['turns'],[])
+
+    def test_popup_translation_verifies_consent_quote_and_page_before_pi(self):
+        key=self.create()['workspace_id']
+        payload={'stage_id':'stage-A','page':1,'excerpt':'A coded aperture controls which measurements are recorded.', 'external_consent':True}
+        with patch.object(self.service,'_translate_excerpt',return_value='编码孔径决定记录哪些测量。') as run:
+            for invalid in ({'page':2}, {'excerpt':'Synthetic research chapter 2'}, {'stage_id':'stage-a'}, {'external_consent':False}):
+                with self.assertRaises(DomainQueryError): self.service.translate(key,{**payload,**invalid})
+            run.assert_not_called()
+            result=self.service.translate(key,payload)
+            self.assertEqual(result,{'translation':'编码孔径决定记录哪些测量。','page':1,'provider':'deepseek'})
+            self.assertEqual(run.call_args.args[1:],('deepseek',payload['excerpt']))
+        self.assertEqual(self.service.get(key,'stage-A')['turns'],[])
+    def test_project_chat_uses_persisted_workspace_without_pdf_authority(self):
+        workspace=self.service.create_project_workspace({'stage_id':'stage-A','provider':'scholarflow-local'})
+        key=workspace['workspace_id']; path,_=self.service._path(key,'stage-A')
+        self.assertIsNone(workspace['pdf']);self.assertFalse((path.parent/'grants/pdf-read.json').exists())
+        self.assertEqual(self.service.list('stage-A')['items'][0]['workspace_id'],key)
+        self.assertEqual(self.service.list('stage-a')['items'],[])
+        with self.assertRaises(DomainQueryError):self.service.get(key,'stage-a')
+        with patch('scholarflow.web_research.threading.Thread.start') as start:
+            base={'stage_id':'stage-A','request_id':'turn-'+'a'*32,'message':'Synthetic topic'}
+            for mode in ('note','knowledge'):
+                with self.assertRaises(DomainQueryError):self.service.prompt(key,{**base,'mode':mode})
+            start.assert_not_called()
+            self.assertEqual(self.service.prompt(key,{**base,'mode':'chat'})['status'],'queued')
+            start.assert_called_once()
+    def test_project_chat_requires_an_exact_project_and_provider_no_pdf_fields(self):
+        for payload in ({'stage_id':'stage-missing','provider':'deepseek'}, {'stage_id':'stage-A'}, {'stage_id':'stage-A','provider':[]}, {'stage_id':'stage-A','provider':'deepseek','pdf_path':'some.pdf'}):
+            with self.assertRaises(DomainQueryError):self.service.create_project_workspace(payload)
+        self.assertFalse(self.service.home.exists())
     def test_web_worker_discovers_the_same_active_nature_home_as_cli(self):
         with patch('scholarflow.nature_skill_package.NatureSkillPackage.status',return_value={'active':'v-synthetic'}):
             env=pi_worker_environment()
@@ -98,6 +173,16 @@ class WebResearchTests(unittest.TestCase):
         self.assertIn('本地 Qwen',turn['error'])
         self.assertIn('不会',turn['error'])
         self.assertEqual(runner.call_count,1)
+    def test_budget_stop_is_not_misreported_as_model_connection_failure(self):
+        result=self.create();key=result['workspace_id']; path,manifest=self.service._path(key,'stage-A')
+        turn={'stage_id':'stage-A','turn_id':'turn-'+'9'*32,'workspace_id':key,'mode':'chat','message':'Synthetic question','status':'queued'}
+        directory=path.parent/'web-turns';directory.mkdir(exist_ok=True);file=directory/(turn['turn_id']+'.json')
+        failure=SimpleNamespace(returncode=1,stdout='',stderr='Error: Frozen test budget reached\nprivate diagnostic must not leak')
+        with patch('scholarflow.web_research.node_command',return_value='node'),patch('scholarflow.web_research.subprocess.run',return_value=failure):
+            self.service._run_turn(path,manifest,turn,file)
+        turn=json.loads(file.read_text(encoding='utf-8'))
+        self.assertIn('预算',turn['error'],turn)
+        self.assertNotIn('private diagnostic',turn['error'])
     def test_upload_selection_keeps_metadata_and_authorized_project(self):
         metadata=self.reader.import_root/self.imported['import_id']/'metadata.json';before=metadata.read_bytes()
         result=self.create();self.assertEqual(result['pdf']['filename'],'original-human-name.pdf');self.assertEqual(metadata.read_bytes(),before)

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./desk-workbench.css";
 
 export const metadata: Metadata = {
   title: "ScholarFlow Research Workbench",

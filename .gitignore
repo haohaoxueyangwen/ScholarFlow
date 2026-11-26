@@ -60,3 +60,24 @@ Desktop.ini
 # Bounded provider probes: synthetic facts, credentials-free events and budgets.
 /.local/api-probes/
 /.local/research-workspaces/
+
+# Additional cross-machine safeguards for local-only data and credentials.
+/.local/
+/.pi/agent/
+/.agents/
+/.codex/
+/.cursor/
+/outputs/
+/wiki/
+/experiments/
+*.gguf
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.npz
+*.h5
+*.hdf5
+*.tif
+*.tiff
+*.pdf

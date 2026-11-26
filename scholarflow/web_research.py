@@ -8,6 +8,7 @@ import subprocess
 import sys
 import threading
 import time
+import unicodedata
 from pathlib import Path
 from uuid import uuid4
 
@@ -16,10 +17,14 @@ from .domain_queries import DomainQueryError
 from .knowledge_jobs import SyncJobStore
 from .persistence import atomic_write_json, file_lock
 from .pi_lifecycle import node_command
+from . import reader_marks
+from .pdf_reading import PdfReadGrant
+from .desk_literature import DeskLiterature
 
 ROOT=Path(__file__).resolve().parents[1]
 NATIVE=ROOT/'.tmp/lightrag-native/venv/Scripts/python.exe'
 TURN=ROOT/'packages/scholarflow-pi/scripts/web-research-turn.mjs'
+TRANSLATE=ROOT/'packages/scholarflow-pi/scripts/web-reader-translate.mjs'
 ID=re.compile(r'workspace-[a-f0-9]{32}\Z')
 TURN_ID=re.compile(r'turn-[a-f0-9]{32}\Z')
 
@@ -49,6 +54,8 @@ class WebResearchService:
         self._lock = threading.Lock()
         self._active = set()
         self._indexing = set()
+        self._translation_slot = threading.BoundedSemaphore(1)
+        self.literature = DeskLiterature()
 
     def projects(self):
         return {"items": [
@@ -134,6 +141,33 @@ class WebResearchService:
         except (ValueError,OSError,KeyError,TypeError) as error:raise DomainQueryError('invalid_argument',str(error)) from error
         return self.get(path.parent.name,stage)
 
+    def create_project_workspace(self, payload):
+        stage, provider = payload.get('stage_id'), payload.get('provider')
+        if set(payload) != {'stage_id','provider'} or not isinstance(stage,str) or not isinstance(provider,str) or provider not in {'deepseek','scholarflow-local'}:
+            raise DomainQueryError('invalid_argument','请选择项目和受支持的模型')
+        try:
+            path = rw.prepare(self.data, stage, provider=provider, home=self.home)
+        except (ValueError,OSError,KeyError,TypeError) as error:
+            raise DomainQueryError('invalid_argument',str(error)) from error
+        return self.get(path.parent.name,stage)
+
+    def _literature_project(self, stage):
+        if not isinstance(stage, str) or not any(item['stage_id'] == stage for item in self.projects()['items']):
+            raise DomainQueryError('invalid_argument', '先选一个有效项目。')
+        return stage
+
+    def search_literature(self, payload):
+        if set(payload) != {'stage_id', 'query', 'page'}:
+            raise DomainQueryError('invalid_argument', '请提供当前项目、检索词和页码。')
+        return self.literature.search(self._literature_project(payload['stage_id']), payload['query'], payload['page'])
+
+    def open_literature(self, payload):
+        if set(payload) != {'stage_id', 'candidate_id', 'pages', 'provider'}:
+            raise DomainQueryError('invalid_argument', '必须从当前项目的搜索结果加入 PDF。')
+        stage = self._literature_project(payload['stage_id'])
+        key = self.literature.open(self.data, stage, self.home, payload['candidate_id'], payload['pages'], payload['provider'])
+        return self.get(key, stage)
+
     def list(self,stage):
         if not isinstance(stage,str) or not any(p['stage_id']==stage for p in self.projects()['items']):raise DomainQueryError('invalid_argument','请先选择有效项目')
         result=[]
@@ -176,6 +210,7 @@ class WebResearchService:
         if not isinstance(text,str) or not text.strip() or len(text)>6000 or mode not in {'chat','note','knowledge'} or not isinstance(key,str) or not TURN_ID.fullmatch(key):
             raise DomainQueryError('invalid_argument','请提供有效的问题和请求标识')
         if mode=='knowledge' and not m['knowledge_configured']:raise DomainQueryError('invalid_state','当前项目尚无已完成的AI知识索引')
+        if mode=='note' and not m['pdf']:raise DomainQueryError('invalid_state','请先打开 PDF，再整理来源笔记')
         if m['provider']=='deepseek' and payload.get('external_consent') is not True:
             raise DomainQueryError('permission_denied','请先确认授权页和相关项目知识可发送至 DeepSeek')
         directory=path.parent/'web-turns';directory.mkdir(exist_ok=True);file=directory/(key+'.json')
@@ -190,12 +225,86 @@ class WebResearchService:
         threading.Thread(target=self._run_turn,args=(path,m,turn,file),daemon=True,name='sf-web-pi-turn').start()
         return turn
 
+    def _reader_document(self, workspace_id, stage):
+        path, manifest = self._path(workspace_id, stage)
+        pdf = manifest['pdf']
+        if not pdf:
+            raise DomainQueryError('invalid_state', '请先打开论文 PDF。')
+        item = rw.ReaderWorkspaceStore(self.data).get_import(pdf['import_id'])
+        if item.get('content_hash') != pdf['original_hash'] or stage not in item.get('project_stage_ids', []):
+            raise DomainQueryError('invalid_state', '当前文件版本或项目关系已变化。')
+        return path, manifest, pdf, item['page_count']
+
+    def marks(self, workspace_id, stage):
+        _, _, pdf, _ = self._reader_document(workspace_id, stage)
+        return reader_marks.list_marks(self.data, stage, pdf['original_hash'])
+
+    def save_mark(self, workspace_id, payload):
+        stage = payload.get('stage_id')
+        _, _, pdf, pages = self._reader_document(workspace_id, stage)
+        return reader_marks.add_mark(self.data, stage, pdf['original_hash'], pages, payload)
+
+    def translate(self, workspace_id, payload):
+        stage, page, excerpt = (payload.get(k) for k in ('stage_id', 'page', 'excerpt'))
+        if set(payload) != {'stage_id', 'page', 'excerpt', 'external_consent'} or type(page) is not int or not isinstance(excerpt, str) or not excerpt.strip() or len(excerpt) > 1500 or type(payload.get('external_consent')) is not bool:
+            raise DomainQueryError('invalid_argument', '请选择不超过 1500 字的原文。')
+        path, manifest, pdf, pages = self._reader_document(workspace_id, stage)
+        grant_path = rw.safe(path.parent / 'grants/pdf-read.json', file=True)
+        grant = PdfReadGrant.from_dict(json.loads(grant_path.read_text(encoding='utf-8')))
+        scope = grant.documents[pdf['document_id']]
+        if (scope['stage_id'] != stage or scope['content_hash'] != pdf['original_hash']
+                or not 1 <= page <= pages or not any(a <= page <= b for a, b in scope['page_ranges'])):
+            raise DomainQueryError('permission_denied', '此页未授权给 Pi，不能翻译。')
+        if manifest['provider'] == 'deepseek' and payload['external_consent'] is not True:
+            raise DomainQueryError('permission_denied', '请先确认把这一段原文发送给 DeepSeek。')
+        if not self._translation_slot.acquire(blocking=False):
+            raise DomainQueryError('session_busy', '已有选段正在翻译，请稍后重试。')
+        try:
+            self._verify_translation_excerpt(pdf, page, excerpt)
+            translation = self._translate_excerpt(path, manifest['provider'], excerpt.strip())
+            return {'translation': translation, 'page': page, 'provider': manifest['provider']}
+        finally:
+            self._translation_slot.release()
+
+    def _verify_translation_excerpt(self, pdf, page, excerpt):
+        def normalized(text):
+            return ''.join(unicodedata.normalize('NFKC', text).replace('\u00ad', '').split())
+        try:
+            import fitz
+            raw = rw.safe(rw.ReaderWorkspaceStore(self.data).pdf_path(pdf['import_id']), file=True).read_bytes()
+            if rw.sha(raw) != pdf['original_hash']:
+                raise ValueError('changed PDF')
+            with fitz.open(stream=raw, filetype='pdf') as document:
+                needle = normalized(excerpt)
+                match = bool(needle) and any(needle in normalized(document[page - 1].get_text(sort=ordered)) for ordered in (False, True))
+        except (ValueError, RuntimeError, OSError, ImportError) as error:
+            raise DomainQueryError('source_unavailable', '无法核对当前页的文字层，未发送翻译请求。') from error
+        if not match:
+            raise DomainQueryError('source_unavailable', '选段未能在此页核对；请缩短选区并避开跨栏或扫描图片。')
+
+    @staticmethod
+    def _translate_excerpt(path, provider, excerpt):
+        try:
+            done = subprocess.run([node_command(), str(TRANSLATE), str(path)], input=json.dumps({'excerpt': excerpt}, ensure_ascii=False),
+                cwd=ROOT, env={**os.environ, 'PYTHONUTF8': '1', 'PYTHONNOUSERSITE': '1', 'SCHOLARFLOW_PYTHON': sys.executable},
+                capture_output=True, text=True, encoding='utf-8', timeout=75)
+            if done.returncode:
+                raise ValueError('Pi translation failed')
+            text = json.loads(done.stdout).get('translation')
+            if not isinstance(text, str) or not text.strip() or len(text) > 12000:
+                raise ValueError('Invalid translation')
+            return text.strip()
+        except (subprocess.SubprocessError, OSError, ValueError, AttributeError) as error:
+            label = '本地 Qwen' if provider == 'scholarflow-local' else 'DeepSeek'
+            raise DomainQueryError('translation_failed', f'{label} 未完成翻译，请检查模型连接后重试。不会切换模型。') from error
+
     def _run_turn(self,path,m,turn,file):
         try:
             with file_lock(path.parent/'web-turn',timeout_seconds=1,stale_seconds=900):
                 turn['status']='running';atomic_write_json(file,turn)
                 stage=m['stage_id'];artifact=m['pdf']['artifact_id'] if m['pdf'] else ''
-                prefix=f'当前受控项目 stage_id={stage}，PDF document_id=selected-pdf，笔记 artifact_id={artifact}。请先读取 research-workflow Skill；仅使用当前授权。\n'
+                source = f'PDF document_id=selected-pdf，笔记 artifact_id={artifact}' if m['pdf'] else '此工作区未绑定 PDF；不要声称读过原文'
+                prefix=f'当前受控项目 stage_id={stage}，{source}。请先读取 research-workflow Skill；仅使用当前授权。\n'
                 if turn['mode']=='note':
                     prefix+='请读取 pdf-note Skill，先调用 sf_pdf_note_context(mode=create)，只依据其全部授权片段及精确 source_versions 生成一份待审阅的笔记提案；不得批准、写文件或声称已保存。不要增强原文结论，不确定之处明确标注；待审阅、未保存等会变化的操作状态只放在对话说明，不能写进笔记正文。最后简短说明待审阅并给出完整提案ID/hash；正文由网页审阅卡展示，无需重复。\n'
                 elif turn['mode']=='knowledge':
@@ -206,6 +315,8 @@ class WebResearchService:
                 if completed.returncode:
                     match=re.search(r'tool_error:(sf_[a-z_]+):([a-z_]+)',completed.stderr)
                     if match:raise RuntimeError(f'工具 {match.group(1)} 返回 {match.group(2)}；本轮已停止，请检查来源或参数。')
+                    if 'Frozen test budget reached' in completed.stderr:
+                        raise RuntimeError('本轮达到设置的运行预算并已停止；可缩小范围或新开会话后重试。已消耗的模型用量不会撤回。')
                     if m['provider']=='scholarflow-local':raise RuntimeError('本地 Qwen 连接或当前资料权限不可用；请检查模型服务和 SSH 隧道，不会自动切换到 DeepSeek。')
                     raise RuntimeError('Pi 会话运行失败，请检查模型连接或当前资料权限')
                 output=json.loads(completed.stdout)

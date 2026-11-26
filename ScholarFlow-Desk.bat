@@ -1,5 +1,5 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\open-research-desk.ps1"
+call "%~dp0ScholarFlow-Agent.bat" web
 if errorlevel 1 pause

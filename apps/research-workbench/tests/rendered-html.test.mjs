@@ -23,14 +23,15 @@ async function render() {
   );
 }
 
-test("server-renders the blank ScholarFlow page", async () => {
+test("server-renders the ScholarFlow reading desk connection state", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
   assert.match(html, /<title>ScholarFlow Research Workbench<\/title>/i);
-  assert.match(html, /正在连接研究服务/);
+  assert.match(html, /正在连接工作台/);
+  assert.match(html, /正在从本机服务加载项目/);
   assert.doesNotMatch(html, /研究项目与执行|新建研究项目|Proposal Center/);
   assert.doesNotMatch(html, /Your site is taking shape|react-loading-skeleton/);
 });

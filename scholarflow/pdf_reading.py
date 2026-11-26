@@ -161,6 +161,23 @@ class PdfSourceService:
 
     def fragment(self, stage_id, document_id, grant, *, block_id, char_start=0, char_end=None):
         _, blocks, versions = self._load(stage_id, document_id, grant)
+        return self._fragment_from_snapshot(blocks, versions, block_id=block_id, char_start=char_start, char_end=char_end)
+
+    def fragments(self, stage_id, document_id, grant, selections):
+        """Read up to eight selectors against one pinned snapshot, then recheck it."""
+        if not isinstance(selections, (list, tuple)) or not 1 <= len(selections) <= 8:
+            _fail("invalid_argument", "A bounded list of exact fragment selectors is required")
+        if any(not isinstance(item, dict) or "block_id" not in item or set(item) - {"block_id", "char_start", "char_end"} for item in selections):
+            _fail("invalid_argument", "Invalid fragment selector")
+        _, blocks, versions = self._load(stage_id, document_id, grant)
+        result = [self._fragment_from_snapshot(blocks, versions, **item) for item in selections]
+        _, _, checked = self._load(stage_id, document_id, grant)
+        if checked != versions:
+            _fail("source_version_conflict", "Source changed during batch read")
+        return result
+
+    @staticmethod
+    def _fragment_from_snapshot(blocks, versions, *, block_id, char_start=0, char_end=None):
         block = next((b for b in blocks if b.block_id == block_id), None)
         if block is None:
             _fail("permission_denied", "Exact block is not within authorized page evidence")

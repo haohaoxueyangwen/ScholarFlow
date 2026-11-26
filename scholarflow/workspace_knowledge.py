@@ -34,9 +34,15 @@ def note_for(path):
     return m, record
 
 
-def render(record):
-    anchors = [{'source': s['source'], 'anchor': s['anchor']} for s in record['source_snapshot']['sources']]
-    return '# ' + record['title'] + '\n\n' + record['content'] + '\n\nDerived note; not full-paper evidence.\nPDF anchors: ' + json.dumps(anchors, ensure_ascii=False, separators=(',', ':')) + '\n'
+def render(record, *, version=1):
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError('Unknown managed-note rendering version')
+    body = '# ' + record['title'] + '\n\n' + record['content'] + '\n\nDerived note; not full-paper evidence.\n'
+    if version == 1:
+        anchors = [{'source': s['source'], 'anchor': s['anchor']} for s in record['source_snapshot']['sources']]
+        return body + 'PDF anchors: ' + json.dumps(anchors, ensure_ascii=False, separators=(',', ':')) + '\n'
+    # V2 retains PDF anchors in origin_artifact metadata, outside indexed text.
+    return body
 
 
 def enqueue(path):
@@ -67,7 +73,7 @@ def managed_current(record, home):
         expected = Path(home)/'managed-sources'/record['source_id']/(origin['fingerprint'].removeprefix('sha256:')+'.md')
         return (home_for(m) == Path(home) and rw.safe(record['path'], file=True) == expected
                 and note['artifact_id'] == origin['artifact_id'] and m['stage_id'] == record['stage_id'] == origin['project_stage_id']
-                and record_fingerprint(note) == origin['fingerprint'] and rw.sha(render(note).encode()) == record['sha256'])
+                and record_fingerprint(note) == origin['fingerprint'] and rw.sha(render(note, version=origin.get('render_version', 1)).encode()) == record['sha256'])
     except (ValueError, OSError, KeyError, TypeError):
         return False
 
@@ -118,19 +124,24 @@ async def process(path):
             cache = home/'managed-sources'/job['source_id']/(job['fingerprint'].removeprefix('sha256:')+'.md')
             if cache.exists():rw.safe(cache,file=True)
             else:rw.safe(cache,exists=False)
-            content = render(note)
+            if cache.exists():
+                content = cache.read_text(encoding='utf-8')
+                if content == render(note, version=2): render_version = 2
+                elif content == render(note, version=1): render_version = 1
+                else: raise ValueError('Managed source cache was edited; do not overwrite')
+            else:
+                render_version = 2
+                content = render(note, version=render_version)
             if len(content.encode()) > 76800:
                 raise ValueError('Note exceeds the 64-chunk indexing budget')
             cache.parent.mkdir(parents=True, exist_ok=True)
-            if cache.exists() and cache.read_text(encoding='utf-8') != content:
-                raise ValueError('Managed source cache was edited; do not overwrite')
             if not cache.exists():
                 atomic_write_text(cache, content)
             record = {'source_id': job['source_id'], 'path': str(cache), 'title': note['title'], 'kind': 'md', 'group': 'saved-research-notes',
                       'stage_id': m['stage_id'], 'sha256': rw.sha(content.encode()), 'bytes': len(content.encode()),
                       'evidence_level': 'derived_pdf_fragment_note',
                       'origin_artifact': {'artifact_id': note['artifact_id'], 'project_stage_id': m['stage_id'],
-                                          'fingerprint': job['fingerprint'], 'workspace': str(Path(path).absolute()),
+                                          'fingerprint': job['fingerprint'], 'workspace': str(Path(path).absolute()), 'render_version': render_version,
                                           'pdf_sources': [{'import_id': s['source']['import_id'], 'anchor': s['anchor']}
                                                           for s in note['source_snapshot']['sources']]}}
             if not managed_current(record, home):

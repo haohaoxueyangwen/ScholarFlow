@@ -2,32 +2,32 @@
   "schema": "scholarflow-public-snapshot-v1",
   "files": [
     {
+      "path": ".env.example",
+      "sha256": "c9807948aadd1d433b3cee13e5c4325874c7518596f2f79708fcd48a5169b38d"
+    },
+    {
       "path": ".gitattributes",
       "sha256": "aab5d105881771bacbabcc6f5b85bf94f51f33bb21d452cc58aef2bd13276516"
     },
     {
       "path": ".gitignore",
-      "sha256": "5491449285c024bcdcd15c4bfbccee8af6487265c413e8f89b80a57df6277049"
+      "sha256": "f2ef08f385e71e3f638a091a6314b63e2818c3e536723385ac66ca99aa716311"
     },
     {
       "path": "apps/research-workbench/.openai/hosting.json",
       "sha256": "d532abb65cf9ae20634b464d954cb4a08a0de9f3cd3cdf7f9c3ec8948826d947"
     },
     {
-      "path": "apps/research-workbench/app/components/annotatable-pdf.tsx",
-      "sha256": "53e561864795d7d6073550fefb94a857433b7dca7b2e047430735945bdfd6c39"
+      "path": "apps/research-workbench/app/components/desk-literature.tsx",
+      "sha256": "f78d726c3ffddfadee47c8d143a986484845c8aed072d10b7ca077849062d3a7"
     },
     {
-      "path": "apps/research-workbench/app/components/citation-graph.tsx",
-      "sha256": "6edda90c9bd3abeb9d6b3f837d2b9ad7385def17e33fa303a0d31899a60169a5"
-    },
-    {
-      "path": "apps/research-workbench/app/components/paper-reader.tsx",
-      "sha256": "aee68dd343e211a795e3a2148ef7a2b135a3fcdc3f6743a9bc7db09d4011ebe6"
+      "path": "apps/research-workbench/app/components/document-reader.tsx",
+      "sha256": "ceff68aacb831a94a76dc21a534e9f2a9dce1cefffc7b68054ceb00a1fcb56e6"
     },
     {
       "path": "apps/research-workbench/app/components/reading-desk.tsx",
-      "sha256": "e81324ad9a22e3784f63379cdc0fa8f1a6b58a66ef79980a69c50ee190d69ecc"
+      "sha256": "b9ef2ed5e88972678fdd69f4df8f703733b2b5abbefd48e22d70da0a36f111d1"
     },
     {
       "path": "apps/research-workbench/app/components/research-loop-workspace.tsx",
@@ -38,8 +38,8 @@
       "sha256": "f3f0a54c090f31019dafb8b26669b37f836e7f4109f06bfee71456ce695287f3"
     },
     {
-      "path": "apps/research-workbench/app/components/translation-popup.tsx",
-      "sha256": "e13b5ca874e86bd1d82ce4cb2b7515e185606c2b02c9000f66a0b5776ec9a601"
+      "path": "apps/research-workbench/app/desk-workbench.css",
+      "sha256": "e6433872b06af035eee0e6b005b862e867b284aecc3d15a98f7aa75276f99fef"
     },
     {
       "path": "apps/research-workbench/app/desk/page.tsx",
@@ -55,7 +55,7 @@
     },
     {
       "path": "apps/research-workbench/app/layout.tsx",
-      "sha256": "245777588c466093ed23423a85cd1eebce541cce7f438d9bb6b5a6f4ef4d10ca"
+      "sha256": "bb4097e5f3e90abba97baaa4a5e5fd48f4b94a30a04011d2cecfbce01ed80d7e"
     },
     {
       "path": "apps/research-workbench/app/lib/api.ts",
@@ -95,7 +95,7 @@
     },
     {
       "path": "apps/research-workbench/app/lib/research-desk.ts",
-      "sha256": "5257f7fceffb69a40ed2080c5975222afbaaa68b1349f49e2ac8cc637a12c359"
+      "sha256": "4d07b71ca529759ce17b0d81acbfbab0e2ac7049d8ae8a196eeb649579035ffd"
     },
     {
       "path": "apps/research-workbench/app/lib/types.ts",
@@ -104,10 +104,6 @@
     {
       "path": "apps/research-workbench/app/page.tsx",
       "sha256": "f407c10f3c278c0d27033c35886183a4855c40870663a592700965ec051e972e"
-    },
-    {
-      "path": "apps/research-workbench/app/reader/page.tsx",
-      "sha256": "b81ac0882737ef2c60186e8100847897126833d07abf102b9ddd0c2d5ec58b90"
     },
     {
       "path": "apps/research-workbench/desktop/main.cjs",
@@ -123,19 +119,27 @@
     },
     {
       "path": "apps/research-workbench/package-lock.json",
-      "sha256": "846c2da438540edddbb5ce17c363644af54f5f6bf1791c8596b547862d2b0616"
+      "sha256": "90b7977f1afe5c9b4866c65d272ab1d225341202fa9f30bfa3444345c67f2eb3"
     },
     {
       "path": "apps/research-workbench/package.json",
-      "sha256": "9536b170c1c9a2dc957b1f74a686d62f1d48eea5c6ca3cf8b3df66fcea4077dd"
+      "sha256": "e401664e593a29f2234d2ff87e593783597fa757f0f68f7b63f268fbffe8a964"
     },
     {
       "path": "apps/research-workbench/postcss.config.mjs",
       "sha256": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde"
     },
     {
+      "path": "apps/research-workbench/public/brand/scholarflow-icon.ico",
+      "sha256": "7d0280ac8ce2694f3321ac2a353d1fe66476308975338f4577208e1c82786b43"
+    },
+    {
       "path": "apps/research-workbench/public/brand/scholarflow-icon.png",
       "sha256": "1ca33c76af1782206f75cc5ba0fa90b52e0a25e3025144cf68198dde8cbf7b51"
+    },
+    {
+      "path": "apps/research-workbench/public/favicon.svg",
+      "sha256": "cf9916fcbf17e7a077c55cf0ba4bdd96881df91522120569dbb3db8e3491aa41"
     },
     {
       "path": "apps/research-workbench/quality/dependency-exceptions.json",
@@ -179,11 +183,11 @@
     },
     {
       "path": "apps/research-workbench/tests/reading-desk.test.mjs",
-      "sha256": "a6fb47ccc32ffc4b4acfdb22b62d0f1ba26b565884d0552de85aaa262cc7c3a7"
+      "sha256": "a08aadb0857c3ec1ab5b9981b800f6bd7caa20a70adfabc99fa27929712cdd34"
     },
     {
       "path": "apps/research-workbench/tests/rendered-html.test.mjs",
-      "sha256": "908088e286a8ada2b704c6973ee1d8db1cf69b93ba78b384fbeddb6567ad65e2"
+      "sha256": "2c7e357008065f1a7124b68f54f0f5b6d4eea585c0c34dcf774ccea0dd83b656"
     },
     {
       "path": "apps/research-workbench/tooling/sites-vite-plugin.ts",
@@ -202,12 +206,20 @@
       "sha256": "0e8e3c7cd9651f237e728a8d3862ec5206dd8fbceebeb9918809b100bdef7d2e"
     },
     {
+      "path": "docs/public/architecture.md",
+      "sha256": "f054356519e9c53af08770d9308047149480da488d16ec94263d23ea3e38bbdc"
+    },
+    {
       "path": "README.md",
-      "sha256": "748730ffe32c1ea78fbe0c22248cfeeaf59863b7ee06254762c51dac8d00540d"
+      "sha256": "3279195d485ea1a76b6ecbac83dda90f12569ebe0202994a950ece231313af6f"
     },
     {
       "path": "docs/public/Windows使用说明.md",
-      "sha256": "4354fc34149107fb7882d625a34d0d668a51695bba6e6d3fa2f205684b7ba3e6"
+      "sha256": "a1ab265186307969d6b5d8a2d1868b0bfa0417cd0848730f293299e2b8c483e7"
+    },
+    {
+      "path": "docs/public/Windows开发交接.md",
+      "sha256": "f11fdad285850dadfa64521ad20bd7bfb7e839c4395bb49f2a67fa2117a4600f"
     },
     {
       "path": "environment-scholar.yml",
@@ -654,6 +666,22 @@
       "sha256": "a2fcb5a34a0912fd2c649a89648b43f5e8e9a75648fd833be970ca12b202ced7"
     },
     {
+      "path": "packages/scholarflow-pi/quality/eval-scoring.test.mjs",
+      "sha256": "d2d355ff723b2c3dc5a353abc371c45aba4bf53530b521f8dd69923b01af94c1"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/evaluation-node-runtime.test.mjs",
+      "sha256": "56d12202135edcd326b335265af10bce77e679d7be837294b5d0b9f50cfd2268"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/evaluation-portable-resources.test.mjs",
+      "sha256": "dba1967ae5da509b806b9ee7f7a1986d45f4a22215ab3fdca042afa4c4dbb291"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/execution-chain.test.mjs",
+      "sha256": "75d4c95a811c7252d9cf93570956ecb944ac3362b61618f66b889c76b99ed496"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/fixtures/local-qwen-echo.ts",
       "sha256": "db2aa7f48a1bca8a98a4459d0d0ec387bf009f1780af894d3964e8931c5161d1"
     },
@@ -662,12 +690,44 @@
       "sha256": "a15e47a0dcfce036b623dce8c7a7de18d222a4a90838097a07683decdf29aa1c"
     },
     {
+      "path": "packages/scholarflow-pi/quality/h002-eval-scoring.test.mjs",
+      "sha256": "6df5276c0eb59b8ad8d812353dfce5432835cf21f17b45dd7b13dbdb203a7f55"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/h003-operation-client.test.mjs",
+      "sha256": "274d96f0fca1e4f34b98c05e2869343ca2ace0764799a781042afc7cc2557dc4"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/h026-library.test.mjs",
+      "sha256": "0794a6e7560d477a7ded4a6f15edfaa2be95e0a2aa3ea8341bf3cc38e7ef0029"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/h028-workflow.test.mjs",
+      "sha256": "8734e91a73eaf4afa687fe5f0116e7ea5e092cc9a9446c98619b511b8453bdee"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/information-duties-v1.json",
       "sha256": "207cea58174881ecaf9207f75fc931586ef8c8225e71d376f5e659c6931f64b3"
     },
     {
+      "path": "packages/scholarflow-pi/quality/intent-extension-lifecycle.test.mjs",
+      "sha256": "2f6951de980b31971221a93e4fb54c6c4be6f0199cfc7f788bb6f70c69033a6c"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/knowledge-engine-manifest.json",
       "sha256": "8864bc64c096e6e26086264cd72b91fbcec961d8902e6208223d6787b18a163b"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/local-qwen.test.mjs",
+      "sha256": "6d3e30f15f09127f25634752e9d6820fd2f2bfd757e4557f75c21208f46a472c"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/minimal-eval-scoring.test.mjs",
+      "sha256": "1f5e1425dea211b02d8ff269b84009dced6002094ad570a4ab0d625179019ea8"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/minimal-project-scope.test.mjs",
+      "sha256": "4d0b71a5200d04e7078550741b5c1a89ad434b13abc3c2b6f98817227c4137de"
     },
     {
       "path": "packages/scholarflow-pi/quality/nature-skill-integration.test.mjs",
@@ -682,12 +742,24 @@
       "sha256": "dc0e891f3388dfc3bb233f765aa71426a080ba2f5ca1e5dfa9f25325f74bfd53"
     },
     {
+      "path": "packages/scholarflow-pi/quality/pi-native-compaction-fixture.test.mjs",
+      "sha256": "0d3e657f04b120215d9f5b89f0d2f67c1f302ba70c29bab3321e3eb5163196d1"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/pi-task-contract-four-exits-v1.json",
       "sha256": "a10fcdd9f4e5229ebdf01677b486385a792c42ea01857974782c2a981bf811b0"
     },
     {
       "path": "packages/scholarflow-pi/quality/project-create-outcomes-v4.json",
       "sha256": "e8e13296627a0f1d276ae4003e93b24f4262727b962831e555641751f77bb5d3"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/project-create-outcomes-v4.test.mjs",
+      "sha256": "2b3408e830eb414e55f76cd5b8d4c2ffb11e92da7dbd045b799a221fc83141d6"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/project-resolution.test.mjs",
+      "sha256": "23102f3719d1175fc48ae430c744d6633d7ee303b43c779ee71cd78bdd4f1ce1"
     },
     {
       "path": "packages/scholarflow-pi/quality/provider-auth.test.mjs",
@@ -710,12 +782,28 @@
       "sha256": "198e12e4c5916866cdc4bf99f841fdd4ff258e7aa7710726ec359d844e3ac3c7"
     },
     {
+      "path": "packages/scholarflow-pi/quality/scholarly-search.test.mjs",
+      "sha256": "3175aea7d4a97ea68c99dda5c1890db250407999243c0a7622551d1eb78bde42"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/skill-contracts.test.mjs",
+      "sha256": "e05185797cb85d922b34af8b856050e6c8d5d1892df473308782f9e16f782fae"
+    },
+    {
       "path": "packages/scholarflow-pi/quality/skill-fixtures.json",
       "sha256": "c8a1d4222ba1b50731898d11c2a8e8286815080cf0cef08cd8a4967dd85c440a"
     },
     {
       "path": "packages/scholarflow-pi/quality/skill-lock.json",
       "sha256": "1c9003403d53c799ce1fc3e54b1da313b49bce9fa8980b9487fef27a6e347dc0"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/task-contract-four-exits.test.mjs",
+      "sha256": "f75e906036924b816ba9418bb2dc497143a396555ce54cc6656d879f117ab99f"
+    },
+    {
+      "path": "packages/scholarflow-pi/quality/turn-context.test.mjs",
+      "sha256": "608374198bfe325a4129b356f95a2ac2167f3163fe7fc44a2cbfe1615a4b324c"
     },
     {
       "path": "packages/scholarflow-pi/scripts/ask-library.mjs",
@@ -739,7 +827,19 @@
     },
     {
       "path": "packages/scholarflow-pi/scripts/evaluate-skills.mjs",
-      "sha256": "cfe7cfcd5eb386bc6461ee90203de1b48c944ed9cfe36008a3b59c8c5aca3cb5"
+      "sha256": "13e5c9270ac67fd554c2e19b492f65c42eaea87715a8a75d428d767478e9b2ab"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/evaluation-resources.mjs",
+      "sha256": "8288061b0c9b01c33ac6c48c71d950684bcaa1efd37afb623fbe56dd5d8b633a"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/h002-eval-scoring.mjs",
+      "sha256": "ea64bf42c84068e585b0c29e6eef8eeb0e82b7de9eca826f3a923d2b0663a738"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/minimal-eval-scoring.mjs",
+      "sha256": "294b1621d9d4764c2d7a41ef68cbc7104061ffcf79a2f561c1a21ce3d3947428"
     },
     {
       "path": "packages/scholarflow-pi/scripts/research-chat.mjs",
@@ -756,6 +856,10 @@
     {
       "path": "packages/scholarflow-pi/scripts/validate-skills.mjs",
       "sha256": "48d5b68139f5c5b49e091024d71476f290b7e552672f10f2b98b104fc4e44692"
+    },
+    {
+      "path": "packages/scholarflow-pi/scripts/web-reader-translate.mjs",
+      "sha256": "405eced0d1d482f266c61cd2d5ca67b7de562b2c81b38d0a198631e864de5664"
     },
     {
       "path": "packages/scholarflow-pi/scripts/web-research-turn.mjs",
@@ -863,7 +967,7 @@
     },
     {
       "path": "ScholarFlow-Desk.bat",
-      "sha256": "daa24c6117db0eaa2797e3159d39d912c49ee15b801fa0961b97eced3bedd801"
+      "sha256": "e90130ed72677bf5cf317890d4b8bb9dd678bf59eba8a18e82bf4fac57467deb"
     },
     {
       "path": "scholarflow/__init__.py",
@@ -900,6 +1004,10 @@
     {
       "path": "scholarflow/dependency_gate.py",
       "sha256": "8b9c81c1d7165b4943c611d35b5e46d48317c0efdd94bd414d54c6b89c56ebfb"
+    },
+    {
+      "path": "scholarflow/desk_literature.py",
+      "sha256": "05ab8581b3dac56737aa0b14bce2895cdb575c28016ddc75766734e4dc0f02b4"
     },
     {
       "path": "scholarflow/domain_queries.py",
@@ -991,7 +1099,7 @@
     },
     {
       "path": "scholarflow/literature_search.py",
-      "sha256": "347c7416fcf7fe4381843e85e05e39650686f6b83ddda53cbd5c2522487e996f"
+      "sha256": "a9f0e87a2285af725636584da16573b575172d3b9d03a6a3622545b53c60bdf8"
     },
     {
       "path": "scholarflow/manuscript.py",
@@ -1027,11 +1135,11 @@
     },
     {
       "path": "scholarflow/pdf_notes.py",
-      "sha256": "f77d477248187de6cc4c6c074882fc11de1a1c5b9c1a92f568ff76c855440655"
+      "sha256": "cb30da1c27226b072de6f128e684a4318375d5f1e6f9118239d432c9b0dbd109"
     },
     {
       "path": "scholarflow/pdf_reading.py",
-      "sha256": "b2e3a5d73bac60f9cdee4cc0a3d6dd6398f02736d286b4e9942fe867fad50c51"
+      "sha256": "36a9981a0d1b3956caa1f05a685dadbec3eb430eb7548b867cc3b57c58095858"
     },
     {
       "path": "scholarflow/persistence.py",
@@ -1086,6 +1194,10 @@
       "sha256": "407ac3e7bafa35d853cc0bbda3a4dc3161c3db6abd8980bf25761bc8db14c2ba"
     },
     {
+      "path": "scholarflow/reader_marks.py",
+      "sha256": "1cae5e9cad07d326ee69b08e0bce6e00142a3002772e0472005b9ab0235385ac"
+    },
+    {
       "path": "scholarflow/reader_translation.py",
       "sha256": "43d5e3bdf78a50381e17213882535bbc389bb9782c8a39feb78e34191575da56"
     },
@@ -1095,7 +1207,7 @@
     },
     {
       "path": "scholarflow/remote_pdf.py",
-      "sha256": "03500f7f1d790c1e318ceb58da2dbd9fe67e0a91786dba690bd8977d0e12797e"
+      "sha256": "11ba9cba3faefeac4cbbe2f7c7e809d2474b06a70f98cf51a2eb8236e389f09b"
     },
     {
       "path": "scholarflow/research_continuity.py",
@@ -1103,7 +1215,7 @@
     },
     {
       "path": "scholarflow/research_http.py",
-      "sha256": "5cf17fbe6658be70222205eef9fc84a9abfc06d353a37c815ea79012d32d3dc9"
+      "sha256": "56ee7f1f1ef895cc6c58c3943eebcc9399b97cb7e90ae0d47aff0ea96114eb9c"
     },
     {
       "path": "scholarflow/research_mutations.py",
@@ -1115,7 +1227,7 @@
     },
     {
       "path": "scholarflow/research_workspace.py",
-      "sha256": "24a281b83c47fe29d561903a9afc5bb29090a43bddac01823f1802e3bc7549df"
+      "sha256": "6fd163dfd62c820788459b43a3599edc7d439f88117df907e5df02dc47b0e8ef"
     },
     {
       "path": "scholarflow/retrieval.py",
@@ -1143,7 +1255,7 @@
     },
     {
       "path": "scholarflow/source_notes.py",
-      "sha256": "fa617022a87e3d945b5a4d101909d7bdd3a279fb306da498ea53380ac199feaf"
+      "sha256": "c4e08f9c3b8363f78b8bd5d9ea61fe5b1cb847bc745e6083067a9e876d5d31dd"
     },
     {
       "path": "scholarflow/storage.py",
@@ -1159,7 +1271,7 @@
     },
     {
       "path": "scholarflow/web_research.py",
-      "sha256": "3262ba372400f6d088218cf81994322c21e41509fd160a60168ec1725748703b"
+      "sha256": "8f97276c625a5987e671189e831ba19ed11ff18e76fd8d8fe7bbbb916d132588"
     },
     {
       "path": "scholarflow/workbench_agent.py",
@@ -1175,7 +1287,7 @@
     },
     {
       "path": "scholarflow/workspace_knowledge.py",
-      "sha256": "73990f6e2cf79cfa698e3d9f843fe37c4f2e94b88b730b1994c5923c3c0e6b5d"
+      "sha256": "4f486576f3f661d0aefd1b6f8dcb9ecb3802a8d19551f0ccf75d27898a5290ce"
     },
     {
       "path": "scholarflow/zotero_client.py",
@@ -1206,6 +1318,10 @@
       "sha256": "731d73c3ac417d4a6c7de24db590ec0ace6ba4172a7d89e0ccb25cd113597734"
     },
     {
+      "path": "scripts/install-reading-desk-shortcut.ps1",
+      "sha256": "320bd395626b0b23d27fc25f0f0bb6c6837e447de532be99fa2a8f4da1a6da8d"
+    },
+    {
       "path": "scripts/install-scholarflow.ps1",
       "sha256": "28a68164e27ea56e9f66941755690a78b62afaf58c9b30c7b801f52fa29930ef"
     },
@@ -1232,6 +1348,10 @@
     {
       "path": "scripts/open-research-desk.ps1",
       "sha256": "9fe04910aeca508b51c378207c1cd9a82d88ea684758f900eadfc019e0865ae8"
+    },
+    {
+      "path": "scripts/pi_native_compaction_smoke.mjs",
+      "sha256": "68f81c8cf9e1c4bb8b5f9672305f6e7ccc9fb799675024a943ed7d80e877f93f"
     },
     {
       "path": "scripts/prepare-local-embedding-gpu.ps1",
@@ -1294,8 +1414,16 @@
       "sha256": "3010cc9a60f04b4ace599c290d098050ee569a031ddf0519220817648c6ba06f"
     },
     {
+      "path": "scripts/workbench_dependency_gate.py",
+      "sha256": "ae293da32776570cefeba1dda180fb3a19049f78a1a4c70f5dd4e5374e22398d"
+    },
+    {
       "path": "scripts/workspace-knowledge.py",
       "sha256": "16b71821905e8ba0de81813c47ddf13ed53a27bf8729fba18c48361e4b291612"
+    },
+    {
+      "path": "tests/browser/research-desk-slow-poll.js",
+      "sha256": "a8bcda2d9069bf9231d799500633436c4edc9796a5c64c0bed86e4419253236a"
     },
     {
       "path": "tests/fixtures/embedding_budget_proxy.py",
@@ -1322,6 +1450,26 @@
       "sha256": "d46e346a6ebf8afd853502b1367ecd6229062281c99f75c16dd55fea35a0f704"
     },
     {
+      "path": "tests/test_h008_pdf_sources.py",
+      "sha256": "d3642ff73b4e8ee2dd403fd11b0b41d9b992970e040dad942fc01ffec31acc15"
+    },
+    {
+      "path": "tests/test_h008c_pdf_notes.py",
+      "sha256": "b8f127b63114b01818f53257ab02dba8fd9788f266c467af25b09405e85a1de0"
+    },
+    {
+      "path": "tests/test_library_answer_rendering.py",
+      "sha256": "b252f26b23a9c8cc5672a56dfd4cfebfedffe4c0add477977101d9c091a2c962"
+    },
+    {
+      "path": "tests/test_library_evidence_metadata.py",
+      "sha256": "7d623d2bd9b10be551bdf7094846828c03dd3187b23efcf36a7ee7e2edb2c57c"
+    },
+    {
+      "path": "tests/test_library_projects.py",
+      "sha256": "855a120a1653ca0b6881d91f974e0a4bc139b14a8431af3532c2b31da57a1260"
+    },
+    {
       "path": "tests/test_library_unicode_state.py",
       "sha256": "ef21500f1e744027499988f54779f561367004d6b8bab4e9374f2c3edbb87089"
     },
@@ -1334,12 +1482,20 @@
       "sha256": "088008cfe985625e55561846e178db349b68ca378d13cd341e43ea6bfa08426a"
     },
     {
+      "path": "tests/test_portable_desk_shortcut.py",
+      "sha256": "42308b0ffbf5229c688b353855d8637bbd59a54e69882fbc14f13e123f56951f"
+    },
+    {
       "path": "tests/test_portable_knowledge.py",
       "sha256": "43bc39eceb593d3532b7e5aa0b217fcb10ea8215d65d9e815075536be10b05e5"
     },
     {
       "path": "tests/test_portable_web_boot.py",
       "sha256": "be03d229fb7eff7a2d82be10653dc402443be95bd43402acaea623bd62203f60"
+    },
+    {
+      "path": "tests/test_pymupdf_blocks.py",
+      "sha256": "a97487a73ad2c548f35aebabaad12c28706ddca0158e9ca265fadbd100aefb94"
     },
     {
       "path": "tests/test_research_continuity.py",
@@ -1355,15 +1511,35 @@
     },
     {
       "path": "tests/test_research_http_security.py",
-      "sha256": "6733e6f6519a9aabdfa378e49443c9fbaca077c948c6c325c3e5d9d97c74a3a4"
+      "sha256": "857bbe8ba78d4bd48fa93c6a08b997d26d82244e4a67f32d81e184fa47d24a11"
     },
     {
       "path": "tests/test_research_workspace.py",
-      "sha256": "8bb6a961d382182fbf56f19269c38b6ee2a0ea06f1c7d11dae812518f6e4a2fe"
+      "sha256": "49ded556d1d0cebbb06f167273f08936ba4f0717924e92fea9b990b2e9de29b2"
     },
     {
       "path": "tests/test_scholarflow_agent_cli.py",
       "sha256": "a74118cfbf69863ac2116d70e00cb230c86df19e2061ab00b442ca2aad7c5135"
+    },
+    {
+      "path": "tests/test_scholarflow_atomic_mutations.py",
+      "sha256": "4be4f2bf571fc2041be2b8a1a63f1e3b8df9b1b89054638cd47b043eaecde853"
+    },
+    {
+      "path": "tests/test_scholarflow_literature_search.py",
+      "sha256": "b1987ae70e3eb06cc7f9c5580aaa5777faf4c732f3e9fdbf8854cbd29a9ff7ee"
+    },
+    {
+      "path": "tests/test_scholarflow_reader_translation.py",
+      "sha256": "bd379becd706017141e97ac26467b252bd371e376201453a9641f7646a9e2a86"
+    },
+    {
+      "path": "tests/test_scholarflow_remote_pdf.py",
+      "sha256": "94b0acff993523c4f72d31351305a4d22e5e806d76ccd7037757e73778335097"
+    },
+    {
+      "path": "tests/test_scholarflow_scientific_document.py",
+      "sha256": "741037ae8c339db6024dc3212bfc29d749b9f28fd1b8ad490b62dca6a646d866"
     },
     {
       "path": "tests/test_source_inventory.py",
@@ -1371,7 +1547,7 @@
     },
     {
       "path": "tests/test_web_research_loop.py",
-      "sha256": "91fc9ba1d88928e817bc666e7f2d125ff3853c3f36c18ba631b56c0b93ff05ce"
+      "sha256": "a717e9f3c99806daf72f8c37a757032c4dc520ac9fac762c41e05a87f9390480"
     },
     {
       "path": "tests/test_windows_process_parent.py",
@@ -1379,7 +1555,7 @@
     },
     {
       "path": "tests/test_workspace_knowledge.py",
-      "sha256": "825761ccd13c049bf45c0e4ddee798dd3757ade5ca83f4ce2152ddfd7651250f"
+      "sha256": "9270df3d1fd1aefda71dd688f448d9ca4023a1c1dc90ad2d7e0a6c8f31294876"
     }
   ],
   "scope": "selected_source_preview",

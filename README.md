@@ -1,14 +1,17 @@
 # ScholarFlow
 
 [Windows 中文安装与使用说明](docs/public/Windows使用说明.md)
+· [跨电脑开发交接](docs/public/Windows开发交接.md)
+· [架构与扩展边界](docs/public/architecture.md)
 
 ScholarFlow is a research-assistant project built around the Pi agent runtime.
 Pi handles model interaction and sessions; ScholarFlow provides research tools,
 evidence-linked notes, project-scoped knowledge, and reviewable write operations.
 
-> **Early source preview:** this repository is a selectively prepared preview,
-> not a complete or production-ready release. A clean-checkout installation and
-> the full research workflow have not yet been qualified.
+> **Development snapshot:** the Pi-based agent, reading desk, domain services,
+> selected tests and install scripts are provided for continued development.
+> This is not a production-ready release; a second Windows computer and the
+> complete research workflow have not been qualified.
 
 The intended research workflow is: select a project and a PDF, discuss selected
 pages with Pi, review a proposed note, and search approved notes with links back
@@ -32,10 +35,11 @@ neither a local model nor an external API is included in this repository.
   instructions does not configure or authorize their scripts, MCP services,
   browsers, external APIs or file writes. Upstream skill files are fetched
   separately; their Apache-2.0 license and third-party notices remain applicable.
-- Windows is the current primary target. Python 3.11+, Node.js 22.19+, the
+- Windows is the current primary target. Python 3.11+ (3.12 recommended), Node.js 22.19+, the
   project dependencies, a configured Pi provider, and separately provisioned
   knowledge services are required. Building has been checked in isolation with
-  previously installed dependencies; installation from a clean clone has not.
+  independently configured model and embedding services; no credentials or
+  personal state are included.
 - No project-level license has been selected. Public visibility alone does not
   grant an open-source license. Third-party components retain their own terms.
 

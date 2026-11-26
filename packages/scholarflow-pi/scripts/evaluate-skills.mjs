@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { assistantText, evaluationStatus, isInfrastructureError, scoreBehavior, toolTrace } from "./eval-scoring.mjs";
 import { assertNodeRuntimeAtLeast } from "./assert-node-runtime.mjs";
+import { offlineContractResourceArgs } from "./evaluation-resources.mjs";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(scriptDir, "..");
@@ -154,6 +155,7 @@ class RpcClient {
     this.eventWaiters = [];
     this.buffer = "";
     const args = [piCliPath(), "--mode", "rpc", "--no-session", "--no-builtin-tools", "--approve"];
+    args.push(...offlineContractResourceArgs({ live, evaluationCwd, packageRoot }));
     if (!live) args.push("--offline");
     if (process.env.SCHOLARFLOW_EVAL_PROVIDER) args.push("--provider", process.env.SCHOLARFLOW_EVAL_PROVIDER);
     if (process.env.SCHOLARFLOW_EVAL_MODEL) args.push("--model", process.env.SCHOLARFLOW_EVAL_MODEL);

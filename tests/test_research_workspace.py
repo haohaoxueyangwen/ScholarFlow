@@ -19,6 +19,21 @@ class WorkspaceTests(unittest.TestCase):
         doc.save(self.pdf);doc.close();self.env=patch.dict(os.environ,{'SCHOLARFLOW_PDF_PARSER':'pymupdf-blocks','SCHOLARFLOW_GROBID_BASE_URL':''});self.env.start()
     def tearDown(self):self.env.stop();self.tmp.cleanup()
     def prepare(self,stage='stage-A',**kwargs):return rw.prepare(self.data,stage,pdf=self.pdf,home=self.home,**kwargs)
+    def test_default_note_sources_include_substantive_text_after_author_blocks(self):
+        blocks = [{'block_id': f'author-{i}', 'page_start': 1, 'text': 'Author name and affiliation'} for i in range(10)]
+        blocks.append({'block_id': 'abstract', 'page_start': 1, 'text': 'Abstract: substantive evidence. ' * 40})
+        selected = rw.default_note_blocks(blocks)
+        self.assertEqual(len(selected), 8)
+        self.assertIn('abstract', [item['block_id'] for item in selected])
+        self.assertEqual([item['block_id'] for item in selected], [item['block_id'] for item in blocks if item in selected])
+
+    def test_default_note_sources_balance_pages_and_preserve_small_scope(self):
+        blocks = [{'block_id': f'p{p}-{i}', 'page_start': p, 'text': ('Page evidence ' * (i + 2))} for p in (1, 2) for i in range(6)]
+        selected = rw.default_note_blocks(blocks)
+        self.assertEqual(len(selected), 8)
+        self.assertEqual({item['page_start'] for item in selected}, {1, 2})
+        self.assertEqual(rw.default_note_blocks(blocks[:3]), blocks[:3])
+
     def proposal(self,path):
         m,facade,grant,scope=rw.note_facade(path);context=rw.call(facade,grant,'pdf.note','context',scope,{'mode':'create'},m)
         p={'mode':'create','artifact_id':m['pdf']['artifact_id'],'changes':{'title':'Synthetic derived note','content':'Derived from approved synthetic fragments, not a real experiment.','status':'draft'},'source_versions':{s['source_id']:s['fingerprint'] for s in context['sources']},'expected_fingerprint':context['expected_fingerprint']}

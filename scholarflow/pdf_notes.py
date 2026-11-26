@@ -30,9 +30,17 @@ def _read_pdf_note_sources(store, stage_id, grant):
     service = PdfSourceService(store.root_dir, grant_guard=guard)
     selections = dict(grant.pdf_sources).get(stage_id, ())
     if not selections: raise MutationError('permission_denied', 'No exact PDF fragments granted')
+    grouped = {}
+    for index, selection in enumerate(selections):
+        grouped.setdefault(selection['document_id'], []).append((index, selection))
+    actuals = {}
+    for document_id, entries in grouped.items():
+        fragments = service.fragments(stage_id, document_id, authority,
+            [{k:v for k,v in selection.items() if k != 'document_id'} for _, selection in entries])
+        actuals.update({index:actual for (index, _), actual in zip(entries, fragments)})
     sources = []
-    for selection in selections:
-        actual = service.fragment(stage_id, selection['document_id'], authority, **{k:v for k,v in selection.items() if k != 'document_id'})
+    for index, selection in enumerate(selections):
+        actual = actuals[index]
         core = {k:actual[k] for k in ('source', 'anchor', 'text')}
         source_id = 'pdf-source-' + record_fingerprint(selection).removeprefix('sha256:')[:24]
         sources.append({'source_id':source_id, 'fingerprint':record_fingerprint(core), 'source_type':'pdf_fragment', **core})

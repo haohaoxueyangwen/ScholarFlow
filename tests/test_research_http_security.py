@@ -19,6 +19,9 @@ class SyntheticService:
     def projects(self):
         return {"items": [{"stage_id": "synthetic-project"}]}
 
+    def create_project_workspace(self, payload):
+        return {"received": payload, "pdf": None}
+
     def preview_project(self, value):
         self.previews += 1
         return {"received": value}
@@ -154,6 +157,16 @@ class ResearchHTTPSecurityTests(unittest.TestCase):
         status, _, body = self.request("POST", "/workspaces/example/revise", headers=base, body=b'{}')
         self.assertEqual(status, 200); self.assertEqual(json.loads(body)["workspace"], "example")
         self.assertEqual(self.service.revisions, 1)
+
+    def test_project_chat_start_requires_operator_intent(self):
+        path='/workspaces/project'
+        headers={'Cookie':self.session(),'Origin':self.origin,'Content-Type':'application/json'}
+        body=b'{"stage_id":"synthetic-project","provider":"scholarflow-local"}'
+        status,_,_=self.request('POST',path,headers=headers,body=body)
+        self.assertEqual(status,403)
+        status,_,payload=self.request('POST',path,headers={**headers,'X-ScholarFlow-Intent':'confirm'},body=body)
+        self.assertEqual(status,201)
+        self.assertIsNone(json.loads(payload)['pdf'])
 
     def test_repeated_rejected_posts_return_403_without_dispatch(self):
         for _ in range(30):

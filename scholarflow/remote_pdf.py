@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import http.client
 import ipaddress
+import json
 import socket
 import ssl
 import time
-from urllib.parse import urljoin, urlsplit, urlunsplit
+import urllib.error
+import urllib.request
+from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit
 
 
 MAX_REMOTE_PDF_BYTES = 80_000_000
@@ -14,6 +17,7 @@ MAX_REDIRECTS = 5
 TOTAL_TIMEOUT_SECONDS = 60.0
 SOCKET_TIMEOUT_SECONDS = 10.0
 CHUNK_BYTES = 128 * 1024
+FAKE_IP_RANGE = ipaddress.ip_network("198.18.0.0/15")
 
 
 class RemotePdfError(ValueError):
@@ -40,11 +44,39 @@ def _validated_target(url: str) -> tuple[str, int, str]:
     return hostname, port, path
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _resolve_synthetic_dns(hostname: str) -> list[str]:
+    """Resolve only the public hostname via TLS when a proxy returned fake IPs.
+
+    Only the hostname (not the PDF path or query) is sent to Google Public DNS.
+    Its returned addresses are checked and pinned by _public_addresses below.
+    """
+    url = "https://dns.google/resolve?" + urlencode({"name": hostname, "type": "A"})
+    request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    try:
+        with urllib.request.build_opener(_NoRedirect()).open(request, timeout=SOCKET_TIMEOUT_SECONDS) as response:
+            raw = response.read(65537)
+        if len(raw) > 65536:
+            raise ValueError("oversized DNS response")
+        payload = json.loads(raw.decode("utf-8"))
+        if not isinstance(payload, dict) or payload.get("Status") != 0 or not isinstance(payload.get("Answer"), list):
+            raise ValueError("invalid DNS response")
+        return [row.get("data") for row in payload["Answer"] if isinstance(row, dict) and row.get("type") == 1]
+    except (OSError, ValueError, UnicodeError, urllib.error.URLError, http.client.HTTPException) as exc:
+        raise RemotePdfError("remote_pdf_unavailable", "public DNS lookup for proxy fake IP failed") from exc
+
+
 def _public_addresses(hostname: str, port: int) -> list[str]:
+    is_literal = True
     try:
         literal = ipaddress.ip_address(hostname)
         addresses = [str(literal)]
     except ValueError:
+        is_literal = False
         try:
             records = socket.getaddrinfo(hostname, port, type=socket.SOCK_STREAM)
             addresses = sorted({str(item[4][0]).split("%", 1)[0] for item in records})
@@ -52,12 +84,26 @@ def _public_addresses(hostname: str, port: int) -> list[str]:
             raise RemotePdfError("remote_pdf_unavailable", "open PDF host could not be resolved") from exc
     if not addresses:
         raise RemotePdfError("remote_pdf_unavailable", "open PDF host has no network addresses")
+    # Some system proxies map every public hostname into the benchmark-only
+    # fake-IP range. Do not connect to those addresses. Resolve the hostname
+    # independently over TLS, then validate every answer and pin the chosen IP.
+    # Mixed/private answers and local names never receive this fallback.
+    try:
+        synthetic_only = all(ipaddress.ip_address(value) in FAKE_IP_RANGE for value in addresses)
+    except ValueError as exc:
+        raise RemotePdfError("remote_pdf_unavailable", "open PDF host returned an invalid address") from exc
+    local_check_name = hostname.rstrip('.')
+    if (not is_literal and "." in local_check_name and not local_check_name.endswith((".local", ".localhost", ".internal"))
+            and synthetic_only):
+        addresses = _resolve_synthetic_dns(hostname)
+        if not addresses:
+            raise RemotePdfError("remote_pdf_unavailable", "public DNS lookup returned no IPv4 address")
     for value in addresses:
         try:
             address = ipaddress.ip_address(value)
         except ValueError as exc:
             raise RemotePdfError("remote_pdf_unavailable", "open PDF host returned an invalid address") from exc
-        if not address.is_global:
+        if not address.is_global or address.is_multicast:
             raise RemotePdfError("remote_pdf_forbidden", "open PDF host resolved to a non-public network")
     return addresses
 

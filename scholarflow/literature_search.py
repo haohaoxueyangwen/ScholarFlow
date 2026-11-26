@@ -73,6 +73,7 @@ class OpenAlexLiteratureSearch:
                     "authorships",
                     "primary_location",
                     "best_oa_location",
+                    "locations",
                     "open_access",
                     "cited_by_count",
                     "abstract_inverted_index",
@@ -165,7 +166,19 @@ def _normalize_openalex_work(work: Mapping[str, Any]) -> dict[str, Any] | None:
     primary_url = _https_url(primary.get("landing_page_url")) or (
         f"https://doi.org/{doi}" if doi else openalex_url
     )
-    pdf_url = _https_url(best_oa.get("pdf_url")) or _https_url(primary.get("pdf_url"))
+    # OpenAlex's preferred OA location can be a landing page even when another
+    # location supplies an open PDF.  Never infer a location's access from the
+    # work-level OA flag, and keep the remote fetcher's normal SSRF checks.
+    locations = work.get("locations")
+    other_open_pdf = next((
+        url for location in (locations[:100] if isinstance(locations, list) else [])
+        if isinstance(location, Mapping) and location.get("is_oa") is True
+        for url in [_https_url(location.get("pdf_url"))] if url
+    ), "")
+    open_pdf_url = (_https_url(best_oa.get("pdf_url")) if best_oa.get("is_oa") is not False else "") \
+        or (_https_url(primary.get("pdf_url")) if primary.get("is_oa") is True else "") \
+        or other_open_pdf
+    pdf_url = _https_url(best_oa.get("pdf_url")) or _https_url(primary.get("pdf_url")) or open_pdf_url
     return {
         "provider": "openalex",
         "result_id": openalex_url.rsplit("/", 1)[-1],
@@ -186,6 +199,8 @@ def _normalize_openalex_work(work: Mapping[str, Any]) -> dict[str, Any] | None:
         },
         "primary_url": primary_url,
         "pdf_url": pdf_url,
+        # A work-level OA flag is not permission to fetch its closed publisher PDF.
+        "open_pdf_url": open_pdf_url,
     }
 
 

@@ -4,7 +4,59 @@ import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { canAskKnowledge, draftKey, isSameScope, previewMatches, readDraft, readReviewDraft, researchRequest, turnStateText, uniquePdfSources, writeDraft, writeReviewDraft } from "../app/lib/research-desk.ts";
+import { buildDocumentDraft, canAskKnowledge, deskLocation, deskPanels, draftKey, fitPaperWidth, isSameScope, previewMatches, readDraft, readReviewDraft, readerPageAuthorized, researchRequest, startSettledPoll, turnStateText, uniquePdfSources, writeDraft, writeReviewDraft } from "../app/lib/research-desk.ts";
+
+test("slow workspace polling never overlaps and stops after cleanup", async () => {
+  let next = 0, calls = 0, finish;
+  const pending = new Map();
+  const clock = { schedule(callback) { const id = ++next; pending.set(id, callback); return id; }, cancel(id) { pending.delete(id); } };
+  const stop = startSettledPoll(() => { calls++; return new Promise(resolve => { finish = resolve; }); }, () => assert.fail("unexpected poll error"), 2, clock);
+  const fire = () => { const [id, callback] = pending.entries().next().value; pending.delete(id); callback(); };
+  fire();
+  assert.equal(calls, 1);
+  assert.equal(pending.size, 0, "no new poll while a slow request is pending");
+  finish(); await Promise.resolve(); await Promise.resolve();
+  assert.equal(pending.size, 1);
+  fire();
+  assert.equal(calls, 2);
+  stop(); finish(); await Promise.resolve(); await Promise.resolve();
+  assert.equal(pending.size, 0, "cleanup prevents a pending request from rescheduling");
+});
+
+test("resize keeps the active side panel and never leaves an empty reader", () => {
+  assert.deepEqual(deskPanels("wide", "pi", false, true, true), { active: "pi", projects: true, document: true, pi: true });
+  assert.deepEqual(deskPanels("split", "pi", false, true, true), { active: "pi", projects: false, document: true, pi: true });
+  assert.deepEqual(deskPanels("split", "document", false, true, true), { active: "document", projects: true, document: true, pi: false });
+  assert.deepEqual(deskPanels("stack", "pi", true, true, true), { active: "pi", projects: false, document: false, pi: true });
+  assert.deepEqual(deskPanels("stack", "projects", true, true, false), { active: "document", projects: false, document: true, pi: false });
+});
+
+test("paper follows width without the old cap and whole-page mode respects height", () => {
+  assert.equal(fitPaperWidth(1340, 800, .75, "width", 1), 1340);
+  assert.equal(fitPaperWidth(1680, 800, .75, "width", 1), 1680);
+  assert.equal(fitPaperWidth(1340, 500, .75, "page", 1), 375);
+  assert.equal(fitPaperWidth(1340, 300, .75, "page", 1), 225);
+  assert.equal(fitPaperWidth(310, 700, .75, "page", 1.25), 387);
+});
+
+test("selected text only enters a Pi draft for an authorized valid page", () => {
+  const permitted = [[2, 2], [4, 6]];
+  for (const page of [0, 1, 3, 5.5, 6, NaN]) assert.equal(readerPageAuthorized(permitted, page, 5), false);
+  assert.equal(readerPageAuthorized(permitted, 5, 5), true);
+  assert.equal(buildDocumentDraft("Existing", "data", 1, permitted, 5), null);
+  assert.equal(buildDocumentDraft("A".repeat(6000), "data", 2, permitted, 5), null);
+  assert.equal(buildDocumentDraft("", " ", 2, permitted, 5), null);
+  assert.match(buildDocumentDraft("Existing", "data", 2, permitted, 5), /^Existing\n\n摘录.*\n【当前 PDF · 第 2 页】\ndata$/);
+});
+
+test("restoring a location requires a known case-exact project and a well-formed workspace ID", () => {
+  const projects = [{stage_id: "stage-A"}, {stage_id: "stage-B"}];
+  const id = `workspace-${"a".repeat(32)}`;
+  assert.deepEqual(deskLocation(`?project=stage-A&workspace=${id}`, projects), {stage:"stage-A", id});
+  assert.deepEqual(deskLocation(`?project=stage-a&workspace=${id}`, projects), {stage:"", id:""});
+  assert.deepEqual(deskLocation("?project=stage-B&workspace=../bad", projects), {stage:"stage-B", id:""});
+  assert.deepEqual(deskLocation(`?workspace=${id}`, projects), {stage:"", id:""});
+});
 
 test("drafts are isolated by both project and workspace and survive remounts", () => {
   const values = new Map();

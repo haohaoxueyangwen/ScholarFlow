@@ -4,8 +4,9 @@ from uuid import uuid4
 import hashlib,json,re,os
 from .storage import ScholarFlowStore
 from .reader_workspace import ReaderWorkspaceStore,MAX_READER_PDF_BYTES
-from .pdf_reading import PdfReadGrant,PdfSourceService
+from .pdf_reading import PdfReadGrant,PdfSourceService,MAX_FRAGMENT_BYTES
 from .pdf_notes import capability_module,read_pdf_note_sources
+from .source_notes import MAX_SOURCE_TOTAL
 from .persistence import atomic_write_json, file_lock
 from .proposal_state import load_proposal_state
 from .mutations import record_fingerprint
@@ -49,6 +50,28 @@ def knowledge_configured(data,stage):
     path=library_home(data)/'project-indexes'/hashlib.sha256(stage.encode()).hexdigest()[:32]/'active-sources.json'
     return path.is_file() and any(not x.get('revoked') for x in json.loads(path.read_text(encoding='utf-8')).get('entries',{}).values())
 
+def default_note_blocks(blocks):
+    """Choose bounded, content-rich blocks across pages, preserving source order.
+
+    This is a heuristic, not a claim of semantic or full-page coverage. Explicit
+    user-selected blocks still take precedence and existing workspaces are not changed.
+    """
+    eligible=[(i,b) for i,b in enumerate(blocks) if len(b['text'].encode('utf-8'))<=MAX_FRAGMENT_BYTES and len(b['text'])<=MAX_SOURCE_TOTAL]
+    if len(eligible)<=8 and sum(len(b['text']) for _,b in eligible)<=MAX_SOURCE_TOTAL:
+        return [b for _,b in eligible]
+    pages={}
+    for item in eligible:pages.setdefault(item[1]['page_start'],[]).append(item)
+    for items in pages.values():items.sort(key=lambda item:(-len(' '.join(item[1]['text'].split())),item[0]))
+    chosen=[];total=0
+    while len(chosen)<8 and any(pages.values()):
+        for items in pages.values():
+            while items:
+                index,block=items.pop(0)
+                if total+len(block['text'])<=MAX_SOURCE_TOTAL:
+                    chosen.append((index,block));total+=len(block['text']);break
+            if len(chosen)>=8:break
+    return [block for _,block in sorted(chosen,key=lambda item:item[0])]
+
 def prepare(data,stage_id,*,pdf=None,import_id=None,pages='1',note_blocks=None,provider='deepseek',home=HOME):
     data=safe(data);store=ScholarFlowStore(data);stage=store.get_project_stage(stage_id)
     if not stage or stage_id.startswith('stage-library-'):raise ValueError('Select an existing exact research project, not a source group')
@@ -76,7 +99,7 @@ def prepare(data,stage_id,*,pdf=None,import_id=None,pages='1',note_blocks=None,p
         value={'principal':'interactive-user','documents':{alias:{'stage_id':stage_id,'import_id':item['import_id'],'content_hash':item['content_hash'],'structure_hash':sha(parsed.read_bytes()),'page_ranges':allowed}}}
         authority=PdfReadGrant.from_dict(value);atomic_write_json(grants/'pdf-read.json',value)
         all_blocks=[b for b in structure['blocks'] if isinstance(b.get('page_start'),int) and isinstance(b.get('page_end'),int) and any(a<=b['page_start']<=b['page_end']<=z for a,z in allowed) and b.get('text','').strip()]
-        selected=all_blocks[:8] if note_blocks is None else [next((b for b in all_blocks if b['block_id']==key),None) for key in note_blocks]
+        selected=default_note_blocks(all_blocks) if note_blocks is None else [next((b for b in all_blocks if b['block_id']==key),None) for key in note_blocks]
         if not selected or any(b is None for b in selected) or len(selected)>8 or len({b['block_id'] for b in selected})!=len(selected):raise ValueError('Choose 1-8 distinct blocks inside the approved pages')
         selectors=[{'document_id':alias,'block_id':b['block_id'],'char_start':0,'char_end':len(b['text'])} for b in selected]
         artifact='artifact-'+uuid4().hex

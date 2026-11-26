@@ -152,14 +152,37 @@ def pdf_version_state(store, snapshot):
     from .pdf_reading import PdfReadGrant, PdfSourceService
     stage = store.get_project_stage(snapshot["stage_id"])
     stage_ok = record_fingerprint(stage.to_dict() if stage else None) == snapshot["stage_fingerprint"]
-    states = []
-    for item in snapshot["sources"]:
+    def check_one(item):
         source, anchor = item["source"], item["anchor"]
         try:
             grant = PdfReadGrant.from_dict({"principal":"source-freshness-observer", "documents":{source["document_id"]:{"stage_id":snapshot["stage_id"], "import_id":source["import_id"], "content_hash":source["content_hash"], "structure_hash":source["structure_hash"], "page_ranges":[[anchor["page_start"],anchor["page_end"]]]}}})
             actual = PdfSourceService(store.root_dir).fragment(snapshot["stage_id"],source["document_id"],grant,block_id=anchor["block_id"],char_start=anchor["char_start"],char_end=anchor["char_end"])
-            matches = record_fingerprint({k:actual[k] for k in ("source","anchor","text")}) == item["fingerprint"]
-        except (ValueError, OSError, KeyError): matches = False
-        states.append({"source_id":item["source_id"],"matches_current":matches})
+            return record_fingerprint({k:actual[k] for k in ("source","anchor","text")}) == item["fingerprint"]
+        except (ValueError, OSError, KeyError): return False
+
+    # Recheck selectors sharing an exact pinned document as one bounded batch.
+    # On any failure, fall back to individual checks to preserve per-source status.
+    grouped = {}
+    for index, item in enumerate(snapshot["sources"]):
+        source = item["source"]
+        key = (source["document_id"], source["import_id"], source["content_hash"], source["structure_hash"])
+        grouped.setdefault(key, []).append((index, item))
+    matches = {}
+    for (document_id, import_id, content_hash, structure_hash), entries in grouped.items():
+        if len(entries) == 1:
+            index, item = entries[0]; matches[index] = check_one(item); continue
+        try:
+            ranges = []
+            for first, last in sorted((item["anchor"]["page_start"], item["anchor"]["page_end"]) for _, item in entries):
+                if ranges and first <= ranges[-1][1] + 1: ranges[-1][1] = max(ranges[-1][1], last)
+                else: ranges.append([first, last])
+            grant = PdfReadGrant.from_dict({"principal":"source-freshness-observer", "documents":{document_id:{"stage_id":snapshot["stage_id"], "import_id":import_id, "content_hash":content_hash, "structure_hash":structure_hash, "page_ranges":ranges}}})
+            selections = [{k:item["anchor"][k] for k in ("block_id", "char_start", "char_end")} for _, item in entries]
+            actuals = PdfSourceService(store.root_dir).fragments(snapshot["stage_id"], document_id, grant, selections)
+            for (index, item), actual in zip(entries, actuals):
+                matches[index] = record_fingerprint({k:actual[k] for k in ("source","anchor","text")}) == item["fingerprint"]
+        except (ValueError, OSError, KeyError):
+            for index, item in entries: matches[index] = check_one(item)
+    states = [{"source_id":item["source_id"], "matches_current":matches[index]} for index, item in enumerate(snapshot["sources"])]
     return {"matches_current":stage_ok and all(s["matches_current"] for s in states),"project_matches_current":stage_ok,"sources":states,"observation":"current pinned PDF/parse/anchor comparison; not a grant or edit-history proof"}
 

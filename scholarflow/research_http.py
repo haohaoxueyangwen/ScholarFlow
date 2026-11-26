@@ -164,11 +164,17 @@ class ResearchHandler(BaseHTTPRequestHandler):
             return 200, service.preview_project(self._read_json())
         if self.command == "POST" and path == "/projects/commit":
             return 200, service.commit_project(self._read_json())
+        if self.command == "POST" and path == "/literature/search":
+            return 200, service.search_literature(self._read_json())
+        if self.command == "POST" and path == "/literature/open":
+            return 201, service.open_literature(self._read_json())
         if self.command == "GET" and path == "/workspaces":
             stage = (query.get("stage_id") or [None])[0]
             return 200, service.list(stage)
         if self.command == "POST" and path == "/workspaces":
             return 201, service.open_pdf(self._read_json())
+        if self.command == "POST" and path == "/workspaces/project":
+            return 201, service.create_project_workspace(self._read_json())
         if self.command == "POST" and path == "/workspaces/upload":
             stage = self.headers.get("X-Stage-Id") or ""
             pages = self.headers.get("X-Pages") or "1"
@@ -178,6 +184,15 @@ class ResearchHandler(BaseHTTPRequestHandler):
             if length <= 0 or length > 80_000_000:
                 raise DomainQueryError("invalid_argument", "请上传不超过 80 MB 的 PDF")
             return 201, service.upload_pdf(stage, filename, self.rfile.read(length), pages=pages, provider=provider)
+        if path.startswith("/workspaces/") and path.endswith("/marks"):
+            workspace_id = path.removeprefix("/workspaces/").removesuffix("/marks").strip("/")
+            if self.command == "GET":
+                return 200, service.marks(workspace_id, (query.get("stage_id") or [None])[0])
+            if self.command == "POST":
+                return 201, service.save_mark(workspace_id, self._read_json())
+        if self.command == "POST" and path.startswith("/workspaces/") and path.endswith("/translate"):
+            workspace_id = path.removeprefix("/workspaces/").removesuffix("/translate").strip("/")
+            return 200, service.translate(workspace_id, self._read_json())
         if self.command == "POST" and path.startswith("/workspaces/") and path.endswith("/turns"):
             workspace_id = path.removeprefix("/workspaces/").removesuffix("/turns").strip("/")
             return 202, service.prompt(workspace_id, self._read_json())

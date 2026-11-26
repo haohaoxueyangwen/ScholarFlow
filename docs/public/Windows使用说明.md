@@ -1,4 +1,4 @@
-# ScholarFlow Windows 预览版：安装和使用
+# ScholarFlow Windows 开发版：安装和使用
 
 这是一个可安装的 **Pi Agent 源码预览包**，不是把模型或知识库一并打包的成品。网页是可选客户端，默认只在本机访问。安装不会自动复制你另一台电脑上的论文、笔记、会话或密钥。
 
@@ -10,10 +10,13 @@
 
 ## 2. 安装
 
-解压 ZIP，在解压后的 `ScholarFlow` 文件夹内打开 PowerShell，运行：
+在新电脑安装 Git 后，可以从公开仓库克隆；也可以解压源码 ZIP。先在希望存放项目的文件夹中打开 PowerShell，运行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-scholarflow.ps1 -WithWeb -WithKnowledge
+git clone https://github.com/haohaoxueyangwen/ScholarFlow.git
+cd ScholarFlow
+$agentHome = Join-Path $env:LOCALAPPDATA 'ScholarFlow-Dev'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-scholarflow.ps1 -AgentHome $agentHome -WithWeb -WithKnowledge
 ```
 
 这会安装 Pi、网页和 LightRAG 的软件依赖，可能需要几分钟。安装程序不会自动修改系统 PATH，也不会清理已有数据；如果提示已有依赖或运行环境，它会停止而不是覆盖。
@@ -21,12 +24,20 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-scholarflo
 ## 3. 启动网页
 
 ```powershell
-$sf = Join-Path $env:LOCALAPPDATA 'ScholarFlow\bin\scholarflow.cmd'
+$sf = Join-Path $agentHome 'bin\scholarflow.cmd'
 & $sf doctor
 & $sf web
 ```
 
-首次启动会建立空的数据目录，不会自动创建项目。网页打开后，可以先创建项目并确认预览，再选择 PDF 与授权阅读页。选择 DeepSeek 时，需要在对话区勾选资料外发同意。
+在新终端使用时，需要重新设置 `$agentHome` 和 `$sf`。首次启动会建立空的数据目录，不会自动创建项目。网页打开后，可以先创建项目并确认预览，再用「找论文」搜索开放 PDF，或选择本地 PDF 并指定授权阅读页。选择 DeepSeek 时，需要在对话区勾选资料外发同意。
+
+如需桌面入口，安装完成后在项目目录运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-reading-desk-shortcut.ps1 -AgentHome $agentHome
+```
+
+脚本只创建「ScholarFlow 阅读台」快捷方式；如果同名快捷方式属于其他程序，它会停止而不是覆盖。快捷方式指向你指定的 `$agentHome`。源码根目录的 `ScholarFlow-Desk.bat` 使用默认 ScholarFlow 用户目录；使用自定义 `$agentHome` 时请使用上面创建的快捷方式或 `$sf web`。
 
 如果端口已被占用，程序会提示冲突，不会强行关闭其他进程。命令行还可用 `& $sf --help` 查看项目、工作区、资料目录和 Nature 命令。
 
@@ -66,4 +77,4 @@ $sf = Join-Path $env:LOCALAPPDATA 'ScholarFlow\bin\scholarflow.cmd'
 & $sf knowledge configure-embedding --help
 ```
 
-现有知识库或工作区只能通过 `--library-home` 和 `--workspace-home` 明确选择；程序不会替你跨电脑同步或迁移。这个预览包尚未在第二台实机上验收，使用真实资料前应先用少量非敏感样本确认。
+现有知识库或工作区只能通过 `--library-home` 和 `--workspace-home` 明确选择；程序不会替你跨电脑同步或迁移。这个开发版尚未在第二台实机上验收，使用真实资料前应先用少量非敏感样本确认。具体源码范围和测试命令见[跨电脑开发交接](Windows开发交接.md)。

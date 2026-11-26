@@ -1,8 +1,60 @@
 /** Small transport and state contracts shared by the Pi-native reading desk. */
 export type DeskScope = { stage: string; id: string; generation: number };
 
+export type DeskPane = "projects" | "document" | "pi";
+export type DeskLayout = "wide" | "split" | "stack";
+export const DESK_WIDE = "(min-width: 1160px)";
+export const DESK_SPLIT = "(min-width: 780px)";
+
+type PollClock = { schedule: (callback: () => void, delay: number) => unknown; cancel: (handle: unknown) => void };
+
+/** Wait for each request to settle before scheduling the next one. */
+export function startSettledPoll(run: () => Promise<void>, onError: (error: unknown) => void, delay = 2000, clock: PollClock = {
+  schedule: (callback, milliseconds) => globalThis.setTimeout(callback, milliseconds),
+  cancel: (handle) => globalThis.clearTimeout(handle as ReturnType<typeof setTimeout>),
+}) {
+  let stopped = false;
+  let handle: unknown;
+  const tick = async () => {
+    if (stopped) return;
+    try { await run(); }
+    catch (error) { if (!stopped) onError(error); }
+    finally { if (!stopped) handle = clock.schedule(() => void tick(), delay); }
+  };
+  handle = clock.schedule(() => void tick(), delay);
+  return () => { stopped = true; clock.cancel(handle); };
+}
+
+export function deskPanels(layout: DeskLayout, pane: DeskPane, reading: boolean, projectsOpen: boolean, piOpen: boolean) {
+  const active = reading && pane === "projects" ? "document" : pane;
+  if (layout === "stack") return { active, projects: active === "projects", pi: active === "pi", document: active === "document" };
+  const projects = !reading && projectsOpen;
+  const both = layout === "split" && projects && piOpen;
+  return { active, projects: projects && (!both || active !== "pi"), pi: piOpen && (!both || active === "pi"), document: true };
+}
+
+export function fitPaperWidth(width: number, height: number, aspect: number, fit: "width" | "page", zoom: number) {
+  const base = fit === "page" ? Math.min(width, height * aspect) : width;
+  return Math.max(1, Math.floor(base * zoom));
+}
+
 export function isSameScope(current: DeskScope, captured: DeskScope): boolean {
   return current.stage === captured.stage && current.id === captured.id && current.generation === captured.generation;
+}
+
+export function deskLocation(search: string, projects: readonly { stage_id: string }[]): { stage: string; id: string } {
+  const params = new URLSearchParams(search);
+  const stage = params.get("project") || "";
+  const id = params.get("workspace") || "";
+  if (!projects.some(project => project.stage_id === stage)) return { stage: "", id: "" };
+  return { stage, id: /^workspace-[a-f0-9]{32}$/.test(id) ? id : "" };
+}
+
+export function replaceDeskLocation(stage: string, id = "") {
+  const url = new URL(window.location.href);
+  if (stage) url.searchParams.set("project", stage); else url.searchParams.delete("project");
+  if (stage && id) url.searchParams.set("workspace", id); else url.searchParams.delete("workspace");
+  window.history.replaceState(window.history.state, "", url);
 }
 
 export function draftKey(project: string, workspace: string): string {
@@ -110,3 +162,16 @@ export async function researchRequest(
   if ((init.method || "GET").toUpperCase() === "POST") headers.set("X-ScholarFlow-Intent", "confirm");
   return fetcher(`${url.origin}${path}`, { ...init, headers, credentials: "include", cache: "no-store" });
 }
+export function readerPageAuthorized(ranges: number[][], page: number, pageCount: number) {
+  return Number.isInteger(page) && page > 0 && page <= pageCount && ranges.some(([first, last]) => first <= page && page <= last);
+}
+
+export function buildDocumentDraft(
+  existing: string, excerpt: string, page: number, ranges: number[][], pageCount: number,
+) {
+  const quote = excerpt.trim();
+  if (!readerPageAuthorized(ranges, page, pageCount) || !quote || quote.length > 1500) return null;
+  const combined = `${existing}${existing ? "\n\n" : ""}摘录，供接下来讨论：\n【当前 PDF · 第 ${page} 页】\n${quote}`;
+  return combined.length <= 6000 ? combined : null;
+}
+
