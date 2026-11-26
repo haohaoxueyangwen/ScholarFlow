@@ -70,6 +70,8 @@ Desktop.ini
 /outputs/
 /wiki/
 /experiments/
+.wrangler/
+.vinext/
 *.gguf
 *.safetensors
 *.ckpt
